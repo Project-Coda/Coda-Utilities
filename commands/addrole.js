@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const mariadb = require('../db.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('addrole')
@@ -17,25 +18,34 @@ module.exports = {
 				.setRequired(true)),
 	async execute(interaction) {
 		const messageLink = interaction.options.get('message-link').value;
-		const roleName = interaction.options.get('role-name').value;
+		const role = interaction.options.get('role-name').value;
 		const emoji = interaction.options.get('emoji').value;
 		// extract the channel id from the message link
 		const channelId = messageLink.split('/')[5];
 		// extract the message id from the message link
 		const messageId = messageLink.split('/')[6];
+		const roleid = role.replace(/[^0-9.]+/g, '');
+		console.log(`roleId: ${roleid}`);
 		console.log(`channelId: ${channelId}`);
 		console.log(`messageId: ${messageId}`);
 		channel = global.client.channels.cache.get(channelId);
 		const message = await channel.messages.fetch(messageId);
-		console.log(message);
-		console.log(emoji);
+		// Add to roles table if it doesn't exist
+		const db = await mariadb.getConnection();
+		await db.query(`INSERT INTO roles (id, emoji, message_id) VALUES ('${roleid}', '${emoji}', '${messageId}')`);
+		db.query(`SELECT * FROM roles`)
+			.then(rows => {
+				console.log(rows);
+			}
+			)
+		await db.end();
 		message.react(emoji).then(() => {
 			console.log('Reacted!');
-			interaction.reply(`Added role ${roleName} to message ${messageLink}`);
+			interaction.reply(`Added role ${roleid} to message ${messageLink}`);
 		},
 		).catch(err => {
 			console.log(err);
-			interaction.reply(`Error adding role ${roleName} to message ${messageLink}`);
+			interaction.reply(`Error adding role ${roleid} to message ${messageLink}`);
 		},
 		);
 	},
