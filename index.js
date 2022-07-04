@@ -60,6 +60,7 @@ client.on('interactionCreate', async interaction => {
 });
 client.on('messageReactionAdd', async (reaction, user) => {
 	if (user.bot) return;
+	if (reaction.message.partial) await reaction.message.fetch();
 	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
@@ -74,5 +75,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		member.roles.add(roleId);
 	}
 	console.log(`${user.username} reacted with ${emoji} to ${message.url} in ${guild.name}`);
+},
+);
+client.on('messageReactionRemove', async (reaction, user) => {
+	if (user.bot) return;
+	if (reaction.message.partial) await reaction.message.fetch();
+	const message = reaction.message;
+	const channel = message.channel;
+	const guild = channel.guild;
+	const emoji = reaction.emoji.name;
+	// query db for role
+	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+	if (role.length === 0) return;
+	const roleId = role[0].id;
+	console.log(roleId);
+	const member = guild.members.cache.get(user.id);
+	if (member) {
+		member.roles.remove(roleId);
+	}
+	console.log(`${user.username} removed ${emoji} to ${message.url} in ${guild.name}`);
 },
 );
