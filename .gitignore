@@ -1,0 +1,6 @@
+node_modules
+env.js
+*.txt
+example-data.yml
+data/*
+testing/*
