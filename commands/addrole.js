@@ -33,11 +33,11 @@ module.exports = {
 		// Add to roles table if it doesn't exist
 		const db = await mariadb.getConnection();
 		await db.query(`INSERT INTO roles (id, emoji, message_id) VALUES ('${roleid}', '${emoji}', '${messageId}')`);
-		db.query(`SELECT * FROM roles`)
+		db.query(`SELECT * FROM roles WHERE id = '${roleid}'`)
 			.then(rows => {
 				console.log(rows);
-			}
-			)
+			},
+			),
 		await db.end();
 		message.react(emoji).then(() => {
 			console.log('Reacted!');
