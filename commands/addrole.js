@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const mariadb = require('../db.js');
 const env = require('../env.js');
+const embedcreator = require('../embed.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('addrole')
@@ -18,16 +19,41 @@ module.exports = {
 				.setDescription('emoji you want to use to represent the role')
 				.setRequired(true)),
 	async execute(interaction) {
+		const messageLink = interaction.options.get('message-link').value;
+		const role = interaction.options.get('role-name').value;
+		const emoji = interaction.options.get('emoji').value;
 		// Limit command to Founders
 		if (!interaction.member.roles.cache.has(env.discord.founders_role)) {
-			global.client.channels.cache.get(env.discord.logs_channel).send(
-				`${interaction.member.displayName} tried to use the addrole command, but doesn't have the Founder role.`);
-			return interaction.reply({ content: 'You are not allowed to use this command, this offence has been reported', ephemeral: true });
+			global.client.channels.cache.get(env.discord.logs_channel).send({
+				embeds: [ embedcreator.setembed(
+					{
+						title: 'Incedent Detected',
+						description: `${interaction.member.user.tag} tried to use the addrole command but did not have the Founders role.
+						Detailed information:
+						Message Link : ${messageLink}
+						Role : ${role}
+						Emoji : ${emoji}`,
+						color: 0xFF0000,
+					},
+				)],
+			});
+			return interaction.reply({
+				embeds: [ embedcreator.setembed(
+					{
+						title: 'Incedent Reported',
+						description: 'You do not have permission to use this command. This incident has been reported.',
+						color: 0xFF0000,
+					},
+				),
+				],
+			}).then(() => {
+				setTimeout(async function() {
+					await interaction.deleteReply();
+				}, 5000);
+			},
+			);
 		}
 		try {
-			const messageLink = interaction.options.get('message-link').value;
-			const role = interaction.options.get('role-name').value;
-			const emoji = interaction.options.get('emoji').value;
 			// extract the channel id from the message link
 			const channelId = messageLink.split('/')[5];
 			// extract the message id from the message link
@@ -53,7 +79,7 @@ module.exports = {
 			},
 			).catch(err => {
 				console.log(err);
-				interaction.reply(`Error adding role ${roleid} to message ${messageLink}`);
+				interaction.reply(`Error adding role ${role} to message ${messageLink}`);
 			},
 			);
 		}
