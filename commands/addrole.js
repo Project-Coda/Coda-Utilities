@@ -36,7 +36,8 @@ module.exports = {
 						color: 0xFF0000,
 					},
 				)],
-			});
+			},
+			);
 			return interaction.reply({
 				embeds: [ embedcreator.setembed(
 					{
@@ -45,13 +46,8 @@ module.exports = {
 						color: 0xFF0000,
 					},
 				),
-				],
-			}).then(() => {
-				setTimeout(async function() {
-					await interaction.deleteReply();
-				}, 5000);
-			},
-			);
+				], ephemeral: true,
+			});
 		}
 		try {
 			// extract the channel id from the message link
