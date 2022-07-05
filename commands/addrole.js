@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const mariadb = require('../db.js');
+const env = require('../env.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('addrole')
@@ -17,36 +18,48 @@ module.exports = {
 				.setDescription('emoji you want to use to represent the role')
 				.setRequired(true)),
 	async execute(interaction) {
-		const messageLink = interaction.options.get('message-link').value;
-		const role = interaction.options.get('role-name').value;
-		const emoji = interaction.options.get('emoji').value;
-		// extract the channel id from the message link
-		const channelId = messageLink.split('/')[5];
-		// extract the message id from the message link
-		const messageId = messageLink.split('/')[6];
-		const roleid = role.replace(/[^0-9.]+/g, '');
-		console.log(`roleId: ${roleid}`);
-		console.log(`channelId: ${channelId}`);
-		console.log(`messageId: ${messageId}`);
-		channel = global.client.channels.cache.get(channelId);
-		const message = await channel.messages.fetch(messageId);
-		// Add to roles table if it doesn't exist
-		const db = await mariadb.getConnection();
-		await db.query(`INSERT INTO roles (id, emoji, message_id) VALUES ('${roleid}', '${emoji}', '${messageId}')`);
-		db.query(`SELECT * FROM roles WHERE id = '${roleid}'`)
-			.then(rows => {
-				console.log(rows);
+		// Limit command to Founders
+		if (!interaction.member.roles.cache.has(env.discord.founders_role)) {
+			global.client.channels.cache.get(env.discord.logs_channel).send(
+				`${interaction.member.displayName} tried to use the addrole command, but doesn't have the Founder role.`);
+			return interaction.reply({ content: 'You are not allowed to use this command, this offence has been reported', ephemeral: true });
+		}
+		try {
+			const messageLink = interaction.options.get('message-link').value;
+			const role = interaction.options.get('role-name').value;
+			const emoji = interaction.options.get('emoji').value;
+			// extract the channel id from the message link
+			const channelId = messageLink.split('/')[5];
+			// extract the message id from the message link
+			const messageId = messageLink.split('/')[6];
+			const roleid = role.replace(/[^0-9.]+/g, '');
+			console.log(`roleId: ${roleid}`);
+			console.log(`channelId: ${channelId}`);
+			console.log(`messageId: ${messageId}`);
+			channel = global.client.channels.cache.get(channelId);
+			const message = await channel.messages.fetch(messageId);
+			// Add to roles table if it doesn't exist
+			const db = await mariadb.getConnection();
+			await db.query(`INSERT INTO roles (id, emoji, message_id) VALUES ('${roleid}', '${emoji}', '${messageId}')`);
+			db.query(`SELECT * FROM roles WHERE id = '${roleid}'`)
+				.then(rows => {
+					console.log(rows);
+				},
+				),
+			await db.end();
+			message.react(emoji).then(() => {
+				console.log('Reacted!');
+				interaction.reply(`Added role ${roleid} to message ${messageLink}`);
 			},
-			),
-		await db.end();
-		message.react(emoji).then(() => {
-			console.log('Reacted!');
-			interaction.reply(`Added role ${roleid} to message ${messageLink}`);
-		},
-		).catch(err => {
+			).catch(err => {
+				console.log(err);
+				interaction.reply(`Error adding role ${roleid} to message ${messageLink}`);
+			},
+			);
+		}
+		catch (err) {
 			console.log(err);
-			interaction.reply(`Error adding role ${roleid} to message ${messageLink}`);
-		},
-		);
+			interaction.reply({ content: 'Invalid data try again', ephemeral: true });
+		}
 	},
 };
