@@ -13,7 +13,7 @@ module.exports = {
 	async execute(interaction) {
 		const role = interaction.options.get('role-name').value;
 		// Limit command to Founders
-		if (!interaction.member.roles.cache.has(env.discord.founders_role)) {
+		if (!interaction.member.roles.cache.has(env.discord.admin_role)) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{

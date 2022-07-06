@@ -24,7 +24,7 @@ module.exports = {
 		const emoji = interaction.options.get('emoji').value;
 		console.log(emoji);
 		// Limit command to Founders
-		if (!interaction.member.roles.cache.has(env.discord.founders_role)) {
+		if (!interaction.member.roles.cache.has(env.discord.admin_role)) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
