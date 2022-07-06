@@ -24,11 +24,11 @@ global.client.once('ready', async () => {
 	db = await mariadb.getConnection();
 	// drop table if it exists
 	// only for testing
-	// await db.query('DROP TABLE IF EXISTS roles');
+	// await db.query('DROP TABLE IF EXISTS notify');
 	// create roles table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
 	// create notify table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id BIGINT PRIMARY KEY, name VARCHAR(255))');
+	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
 }
 )();
 const commands = [];

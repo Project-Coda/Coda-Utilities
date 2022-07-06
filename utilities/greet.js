@@ -5,14 +5,15 @@ const embedcreator = require('../embed.js');
 async function getUsers() {
 	db = await mariadb.getConnection();
 	[rows] = await db.query('SELECT user_id FROM notify');
+	uservalues = Object.values(await rows);
 	db.end();
-	return rows;
+	return uservalues;
 }
 
 async function sendNotify(member) {
 	const users = await getUsers();
-	console.log(users);
-	for (userId in users) {
+	for (userId of users) {
+		console.log(userId);
 		const user = await global.client.users.fetch(userId);
 		user.send(
 			{
@@ -30,4 +31,4 @@ async function sendNotify(member) {
 		);
 	}
 }
-module.exports = { sendNotify };
+module.exports = { sendNotify, getUsers };
