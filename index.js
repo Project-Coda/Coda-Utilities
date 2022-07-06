@@ -5,6 +5,7 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
 const embedcreator = require('./embed.js');
+const greet = require('./utilities/greet.js');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -26,6 +27,8 @@ global.client.once('ready', async () => {
 	// await db.query('DROP TABLE IF EXISTS roles');
 	// create roles table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
+	// create notify table if it doesn't exist
+	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id BIGINT PRIMARY KEY, name VARCHAR(255))');
 }
 )();
 const commands = [];
@@ -62,16 +65,7 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 global.client.on('guildMemberAdd', async member => {
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 
-	global.client.channels.cache.get(env.discord.logs_channel).send({
-		embeds: [ embedcreator.setembed(
-			{
-				title: 'Member joined',
-				description: `${member.user.tag} has joined the server.`,
-				color: '#e74c3c',
-			},
-		)],
-	},
-	);
+	greet.sendNotify(member);
 	// Update presence
 	const members = await guild.members.fetch();
 	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
