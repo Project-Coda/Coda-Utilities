@@ -61,13 +61,17 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 
 global.client.on('guildMemberAdd', async member => {
 	const guild = global.client.guilds.cache.get(env.discord.guild);
-	const channel = guild.channels.cache.get(env.discord.logs_channel);
-	const embed = embedcreator.setembed({
-		title: 'Member joined',
-		description: `${member.user.tag}`,
-		color: 0x00ff00,
-	});
-	channel.send({ embed });
+
+	global.client.channels.cache.get(env.discord.logs_channel).send({
+		emdeds: [embedcreator.setembed(
+			{
+				title: 'Member joined',
+				description: 'Someone joined the server!',
+				color: '#00ff00',
+			},
+		)],
+	},
+	);
 	// Update presence
 	const members = await guild.members.fetch();
 	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
