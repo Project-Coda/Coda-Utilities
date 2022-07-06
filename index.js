@@ -16,8 +16,8 @@ global.client.once('ready', async () => {
 (async () => {
 	db = await mariadb.getConnection();
 	// drop table if it exists
+	// only for testing
 	// await db.query('DROP TABLE IF EXISTS roles');
-	// create table
 	// create roles table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
 }
