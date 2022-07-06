@@ -69,7 +69,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, parseInt(message.id)]);
+	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
 	console.log(roleId);
@@ -88,7 +88,7 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, parseInt(message.id)]);
+	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
 	console.log(roleId);
