@@ -4,6 +4,7 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
+const embedcreator = require('./embed.js');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -11,6 +12,11 @@ global.client = new Client({
 global.client.login(env.discord.token);
 global.client.once('ready', async () => {
 	console.log('Ready!');
+	// get the number of users in the server
+	const guild = global.client.guilds.cache.get(env.discord.guild);
+	const members = await guild.members.fetch();
+	// set the client's presence
+	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
 });
 
 (async () => {
@@ -52,6 +58,21 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 		console.error(error);
 	}
 })();
+
+global.client.on('guildMemberAdd', async member => {
+	const guild = global.client.guilds.cache.get(env.discord.guild);
+	const channel = guild.channels.cache.get(env.discord.logs_channel);
+	const embed = embedcreator.setembed({
+		title: 'Member joined',
+		description: `${member.user.tag}`,
+		color: 0x00ff00,
+	});
+	channel.send({ embed });
+	// Update presence
+	const members = await guild.members.fetch();
+	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+},
+);
 
 global.client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
