@@ -10,7 +10,7 @@ module.exports = {
 			option.setName('message-link')
 				.setDescription('link to the message you want to add the role to')
 				.setRequired(true))
-		.addStringOption(option =>
+		.addRoleOption(option =>
 			option.setName('role-name')
 				.setDescription('name of the role you want to add')
 				.setRequired(true))

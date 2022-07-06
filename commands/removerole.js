@@ -6,7 +6,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('removerole')
 		.setDescription('remove role from database')
-		.addStringOption(option =>
+		.addRoleOption(option =>
 			option.setName('role-name')
 				.setDescription('@ the role you want to remove')
 				.setRequired(true)),
