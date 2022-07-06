@@ -19,7 +19,7 @@ global.client.once('ready', async () => {
 	// await db.query('DROP TABLE IF EXISTS roles');
 	// create table
 	// create roles table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), message_id BIGINT)');
+	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
 }
 )();
 const commands = [];
@@ -72,7 +72,6 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
-	console.log(roleId);
 	const member = guild.members.cache.get(user.id);
 	if (member) {
 		member.roles.add(roleId);
@@ -91,7 +90,6 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
-	console.log(roleId);
 	const member = guild.members.cache.get(user.id);
 	const roleName = guild.roles.cache.get(roleId).name;
 	if (member) {
