@@ -8,15 +8,18 @@ global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
+global.client.login(env.discord.token);
 global.client.once('ready', async () => {
 	console.log('Ready!');
 });
 
-global.client.login(env.discord.token);
 (async () => {
 	db = await mariadb.getConnection();
+	// drop table if it exists
+	// await db.query('DROP TABLE IF EXISTS roles');
+	// create table
 	// create roles table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), message_id BIGINT)');
+	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), message_id BIGINT)');
 }
 )();
 const commands = [];
@@ -50,7 +53,7 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 	}
 })();
 
-client.on('interactionCreate', async interaction => {
+global.client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 	console.log(interaction.commandName);
 	const commandFile = `./commands/${interaction.commandName}.js`;
@@ -58,7 +61,7 @@ client.on('interactionCreate', async interaction => {
 	const command = require(commandFile);
 	await command.execute(interaction);
 });
-client.on('messageReactionAdd', async (reaction, user) => {
+global.client.on('messageReactionAdd', async (reaction, user) => {
 	if (user.bot) return;
 	if (reaction.message.partial) await reaction.message.fetch();
 	const message = reaction.message;
@@ -66,18 +69,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, parseInt(message.id)]);
 	if (role.length === 0) return;
-	const roleId = role[0].id;
+	const roleId = String(role[0].id);
 	console.log(roleId);
 	const member = guild.members.cache.get(user.id);
 	if (member) {
 		member.roles.add(roleId);
 	}
-	console.log(`${user.username} reacted with ${emoji} to ${message.url} in ${guild.name}`);
+	console.log(`${user.username} reacted to ${roleId} in ${guild.name}`);
 },
 );
-client.on('messageReactionRemove', async (reaction, user) => {
+global.client.on('messageReactionRemove', async (reaction, user) => {
 	if (user.bot) return;
 	if (reaction.message.partial) await reaction.message.fetch();
 	const message = reaction.message;
@@ -85,14 +88,15 @@ client.on('messageReactionRemove', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, parseInt(message.id)]);
 	if (role.length === 0) return;
-	const roleId = role[0].id;
+	const roleId = String(role[0].id);
 	console.log(roleId);
 	const member = guild.members.cache.get(user.id);
+	const roleName = guild.roles.cache.get(roleId).name;
 	if (member) {
 		member.roles.remove(roleId);
 	}
-	console.log(`${user.username} removed ${emoji} to ${message.url} in ${guild.name}`);
+	console.log(`${user.username} un-reacted to ${roleName} in ${guild.name}`);
 },
 );
