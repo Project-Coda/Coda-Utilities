@@ -63,11 +63,11 @@ global.client.on('guildMemberAdd', async member => {
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 
 	global.client.channels.cache.get(env.discord.logs_channel).send({
-		emdeds: [embedcreator.setembed(
+		embeds: [ embedcreator.setembed(
 			{
 				title: 'Member joined',
-				description: 'Someone joined the server!',
-				color: '#00ff00',
+				description: `${member.user.tag} has joined the server.`,
+				color: '#e74c3c',
 			},
 		)],
 	},
