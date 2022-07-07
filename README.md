@@ -11,4 +11,3 @@ A Discord bot that provieds utilities for Coda.
 Written by [@ikifar2012](https://github.com/ikifar2012)
 
 Special Thanks to [Bakobiibizo](https://linktr.ee/bakobiibizo) for help with the reaction roles logic.
-
