@@ -46,7 +46,7 @@ module.exports = {
 			});
 		}
 		// Limit command to Founders
-		if (!interaction.member.roles.cache.has(env.discord.admin_role)) {
+		if (!interaction.member.roles.cache.has(env.discord.admin_role) || !interaction.member.roles.cache.has(env.discord.mod_role)) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
