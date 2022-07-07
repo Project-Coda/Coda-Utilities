@@ -19,9 +19,9 @@ async function sendNotify(member) {
 			{
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Notification',
-						description: `${member.user.tag} has joined ${global.client.guilds.cache.get(env.discord.guild).name}`,
-						color: '#00ff00',
+						title: 'New Member',
+						description: `${member.user} has joined ${global.client.guilds.cache.get(env.discord.guild).name}`,
+						color: '#19ebfe',
 						image: {
 							url: `${member.user.avatarURL({ dynamic: true })}`,
 						},
