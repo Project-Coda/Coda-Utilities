@@ -22,12 +22,12 @@ module.exports = {
 		),
 	async execute(interaction) {
 		// Limit command to Founders and Mods
-		if (!interaction.member.roles.cache.has(env.discord.admin_role) || !interaction.member.roles.cache.has(env.discord.mod_role)) {
+		if (!(interaction.member.roles.cache.has(env.discord.admin_role) || interaction.member.roles.cache.has(env.discord.mod_role))) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
 						title: 'Incedent Detected',
-						description: `${interaction.member.user} tried to use the vc move command but did not have the Founders role.`,
+						description: `${interaction.member.user} tried to use the vc move command but did not have the correct role.`,
 						color: '#e74c3c',
 					},
 				)],

@@ -45,13 +45,13 @@ module.exports = {
 				)], ephemeral: true,
 			});
 		}
-		// Limit command to Founders
-		if (!interaction.member.roles.cache.has(env.discord.admin_role) || !interaction.member.roles.cache.has(env.discord.mod_role)) {
+		// Limit command to Founders and Mods
+		if (!(interaction.member.roles.cache.has(env.discord.admin_role) || interaction.member.roles.cache.has(env.discord.mod_role))) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
 						title: 'Incedent Detected',
-						description: `${interaction.member.user.tag} tried to use the notify command but did not have the Founders role.
+						description: `${interaction.member.user} tried to use the notify command but did not have the correct role.
                         Detailed information:
                         User ID : ${userId}`,
 						color: '#e74c3c',
