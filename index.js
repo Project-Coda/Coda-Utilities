@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
 global.client = new Client({
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
+	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 global.client.login(env.discord.token);
