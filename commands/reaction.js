@@ -4,8 +4,8 @@ const env = require('../env.js');
 const embedcreator = require('../embed.js');
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('role')
-		.setDescription('role assign')
+		.setName('reaction')
+		.setDescription('reaction roles')
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('add')
@@ -49,7 +49,7 @@ module.exports = {
 						description: `${interaction.member.user.tag} tried to use the addrole command but did not have the Founders role.
 						Detailed information:
 						Message Link : ${messageLink}
-						Role : ${role}
+						Role : ${roleName}
 						Emoji : ${emoji}`,
 						color: '#e74c3c',
 					},
@@ -84,8 +84,8 @@ module.exports = {
 				const roleid = role.replace(/[^0-9.]+/g, '');
 				// check if role exists in the guild
 				console.log(roleid);
-				const rolecheck = global.client.guilds.cache.get(env.discord.guild).roles.cache.get(roleid);
-				if (!rolecheck) {
+				const roleName = global.client.guilds.cache.get(env.discord.guild).roles.cache.get(roleid);
+				if (!roleName) {
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
@@ -113,7 +113,7 @@ module.exports = {
 							{
 								title: 'Added Role',
 								url: messageLink,
-								description: `Added role ${role} to message ${messageLink}`,
+								description: `Added role ${roleName} to message ${messageLink}`,
 								color: '#2ecc71',
 							},
 						),
@@ -126,7 +126,7 @@ module.exports = {
 						embeds: [ embedcreator.setembed(
 							{
 								title: 'Error',
-								description: `Error adding role ${role} to message ${messageLink}`,
+								description: `Error adding role ${roleName} to message ${messageLink}`,
 								color: '#e74c3c',
 							},
 						),
@@ -153,9 +153,8 @@ module.exports = {
 		if (subcommand === 'remove') {
 			try {
 				const roleid = role.replace(/[^0-9.]+/g, '');
-				console.log(roleid);
-				const rolecheck = global.client.guilds.cache.get(env.discord.guild).roles.cache.get(roleid);
-				if (!rolecheck) {
+				const roleName = global.client.guilds.cache.get(env.discord.guild).roles.cache.get(roleid);
+				if (!roleName) {
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
@@ -199,12 +198,12 @@ module.exports = {
 				await db.query('DELETE FROM roles WHERE id = ?', [roleid]);
 				// lookup emoji id in guild
 				message.reactions.cache.get(emojiId).remove().then(() => {
-					console.log(`Removed ${role} from database`);
+					console.log(`Removed ${roleName} from database`);
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
 								title: 'Added Role',
-								description: `Removed ${role} from the database`,
+								description: `Removed ${roleName} from the database`,
 								color: '#2ecc71',
 							},
 						),
@@ -217,7 +216,7 @@ module.exports = {
 						embeds: [ embedcreator.setembed(
 							{
 								title: 'Error',
-								description: `Error removing ${role} from the database`,
+								description: `Error removing ${roleName} from the database`,
 								color: '#e74c3c',
 							},
 						),

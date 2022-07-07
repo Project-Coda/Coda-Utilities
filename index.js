@@ -98,11 +98,12 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
+	const roleName = guild.roles.cache.get(roleId).name;
 	const member = guild.members.cache.get(user.id);
 	if (member) {
 		member.roles.add(roleId);
 	}
-	console.log(`${user.username} reacted to ${roleId} in ${guild.name}`);
+	console.log(`${user.username} reacted to ${roleName} in ${guild.name}`);
 },
 );
 global.client.on('messageReactionRemove', async (reaction, user) => {
