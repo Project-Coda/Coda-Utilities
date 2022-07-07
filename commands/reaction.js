@@ -46,7 +46,7 @@ module.exports = {
 				embeds: [ embedcreator.setembed(
 					{
 						title: 'Incedent Detected',
-						description: `${interaction.member.user.tag} tried to use the addrole command but did not have the Founders role.
+						description: `${interaction.member.user} tried to use the addrole command but did not have the Founders role.
 						Detailed information:
 						Message Link : ${messageLink}
 						Role : ${roleName}
