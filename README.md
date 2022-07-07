@@ -1,6 +1,6 @@
 # Coda Utilities Bot
 
-A Discord bot that provieds utilities for Coda.
+A Discord bot that provides utilities for Coda.
 
 ## Features
 
