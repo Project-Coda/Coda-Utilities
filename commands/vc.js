@@ -58,8 +58,19 @@ module.exports = {
 					sourcevc = global.client.channels.cache.get(sourceid);
 					destinationvc = global.client.channels.cache.get(destination);
 					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
+						people = [];
 						sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
+							people.push(member);
+						});
+						return interaction.reply({
+							embeds: [ embedcreator.setembed(
+								{
+									title: 'Success',
+									description: `Successfully moved ${people} from ${sourcevc.name} to ${destinationvc.name}`,
+									color: '#19ebfe',
+								},
+							)],
 						});
 					}
 					else {
@@ -76,12 +87,24 @@ module.exports = {
 					}
 				}
 				else {
+					console.log(interaction);
 					sourcevc = global.client.channels.cache.get(interaction.member.voice.channel.id);
 					destinationvc = global.client.channels.cache.get(destination);
 					console.log(sourcevc.type);
 					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
+						people = [];
 						sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
+							people.push(member);
+						});
+						return interaction.reply({
+							embeds: [ embedcreator.setembed(
+								{
+									title: 'Success',
+									description: `Successfully moved ${people} from ${sourcevc.name} to ${destinationvc.name}`,
+									color: '#19ebfe',
+								},
+							)],
 						});
 					}
 					else {
