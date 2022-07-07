@@ -21,7 +21,7 @@ module.exports = {
 						.setRequired(false)),
 		),
 	async execute(interaction) {
-		// Limit command to Founders
+		// Limit command to Founders and Mods
 		if (!interaction.member.roles.cache.has(env.discord.admin_role) || !interaction.member.roles.cache.has(env.discord.mod_role)) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
@@ -45,20 +45,20 @@ module.exports = {
 			});
 		}
 		try {
+			const people = [];
 			const subcommand = interaction.options.getSubcommand();
 			const userdestination = interaction.options.get('destination').value;
 			const destination = userdestination.replace(/[^0-9.]+/g, '');
+			const destinationvc = global.client.channels.cache.get(destination);
 			console.log(destination);
 			if (subcommand === 'move') {
 				console.log('move');
 				if (interaction.options.get('source')) {
 					console.log('source');
-					usersource = interaction.options.get('source').value;
-					sourceid = usersource.replace(/[^0-9.]+/g, '');
-					sourcevc = global.client.channels.cache.get(sourceid);
-					destinationvc = global.client.channels.cache.get(destination);
+					var usersource = interaction.options.get('source').value;
+					var sourceid = usersource.replace(/[^0-9.]+/g, '');
+					var sourcevc = await global.client.channels.cache.get(sourceid);
 					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
-						people = [];
 						await sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
@@ -71,6 +71,7 @@ module.exports = {
 									color: '#19ebfe',
 								},
 							)],
+							ephemeral: true,
 						});
 					}
 					else {
@@ -87,13 +88,9 @@ module.exports = {
 					}
 				}
 				else {
-					console.log(interaction);
-					sourcevc = global.client.channels.cache.get(interaction.member.voice.channel.id);
-					destinationvc = global.client.channels.cache.get(destination);
-					console.log(sourcevc.type);
-					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
-						people = [];
-						await sourcevc.members.forEach(member => {
+					var sourcevcauto = await global.client.channels.cache.get(interaction.member.voice.channel.id);
+					if (sourcevcauto && sourcevcauto.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
+						await sourcevcauto.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
 						});
@@ -101,10 +98,11 @@ module.exports = {
 							embeds: [ embedcreator.setembed(
 								{
 									title: 'Success',
-									description: `Successfully moved ${people} from ${sourcevc} to ${destinationvc}`,
+									description: `Successfully moved ${people} from ${sourcevcauto} to ${destinationvc}`,
 									color: '#19ebfe',
 								},
 							)],
+							ephemeral: true,
 						});
 					}
 					else {
