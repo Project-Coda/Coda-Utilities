@@ -1,6 +1,8 @@
 services:
   db:
     image: mariadb:latest
+    volumes:
+      - ./db-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "mariadb"
       MYSQL_DATABASE: "mariadb"
@@ -10,7 +12,7 @@ services:
   coda-utilites:
     image: ghcr.io/coda-labs/coda-utilities:latest
     volumes:
-      - ./coda-utilities/env.js:./env.js
+      - ./coda-utilities/env.js:/app/env.js
     networks:
       - coda
     depends_on:
