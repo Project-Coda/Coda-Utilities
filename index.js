@@ -4,7 +4,6 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
-const embedcreator = require('./embed.js');
 const greet = require('./utilities/greet.js');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
@@ -82,7 +81,15 @@ global.client.on('interactionCreate', async interaction => {
 });
 global.client.on('messageReactionAdd', async (reaction, user) => {
 	if (user.bot) return;
-	if (reaction.message.partial) await reaction.message.fetch();
+	if (reaction.partial) {
+		try {
+			await reaction.fetch();
+		}
+		catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			return;
+		}
+	}
 	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
