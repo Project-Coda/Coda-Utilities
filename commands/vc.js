@@ -59,7 +59,7 @@ module.exports = {
 					destinationvc = global.client.channels.cache.get(destination);
 					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
 						people = [];
-						sourcevc.members.forEach(member => {
+						await sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
 						});
@@ -67,7 +67,7 @@ module.exports = {
 							embeds: [ embedcreator.setembed(
 								{
 									title: 'Success',
-									description: `Successfully moved ${people} from ${sourcevc.name} to ${destinationvc.name}`,
+									description: `Successfully moved ${people} from ${sourcevc} to ${destinationvc}`,
 									color: '#19ebfe',
 								},
 							)],
@@ -93,7 +93,7 @@ module.exports = {
 					console.log(sourcevc.type);
 					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
 						people = [];
-						sourcevc.members.forEach(member => {
+						await sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
 						});
@@ -101,7 +101,7 @@ module.exports = {
 							embeds: [ embedcreator.setembed(
 								{
 									title: 'Success',
-									description: `Successfully moved ${people} from ${sourcevc.name} to ${destinationvc.name}`,
+									description: `Successfully moved ${people} from ${sourcevc} to ${destinationvc}`,
 									color: '#19ebfe',
 								},
 							)],
