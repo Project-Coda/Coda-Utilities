@@ -107,8 +107,15 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 );
 global.client.on('messageReactionRemove', async (reaction, user) => {
 	if (user.bot) return;
-	if (reaction.message.partial) await reaction.message.fetch();
-	const message = reaction.message;
+	if (reaction.partial) {
+		try {
+			await reaction.fetch();
+		}
+		catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			return;
+		}
+	}	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
