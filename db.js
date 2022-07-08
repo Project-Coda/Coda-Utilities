@@ -6,6 +6,7 @@ const pool = mariadb.createPool({
 	user: env.mariadb.user,
 	password: env.mariadb.password,
 	database: env.mariadb.database,
+	charset: 'utf8mb4',
 });
 
 module.exports = {
