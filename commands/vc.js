@@ -26,7 +26,7 @@ module.exports = {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Detected',
+						title: 'Incident Detected',
 						description: `${interaction.member.user} tried to use the vc move command but did not have the correct role.`,
 						color: '#e74c3c',
 					},
@@ -36,7 +36,7 @@ module.exports = {
 			return interaction.reply({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Reported',
+						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
 						color: '#e74c3c',
 					},

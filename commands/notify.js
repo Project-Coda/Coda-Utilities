@@ -50,7 +50,7 @@ module.exports = {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Detected',
+						title: 'Incident Detected',
 						description: `${interaction.member.user} tried to use the notify command but did not have the correct role.
                         Detailed information:
                         User ID : ${userId}`,
@@ -62,7 +62,7 @@ module.exports = {
 			return interaction.reply({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Reported',
+						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
 						color: '#e74c3c',
 					},
@@ -104,7 +104,7 @@ module.exports = {
 					embeds: [ embedcreator.setembed(
 						{
 							title: 'Error',
-							description: 'An error occured while adding the user to the notify list',
+							description: 'An error occurred while adding the user to the notify list',
 							color: '#e74c3c',
 						},
 					)], ephemeral: true,
@@ -145,7 +145,7 @@ module.exports = {
 					embeds: [ embedcreator.setembed(
 						{
 							title: 'Error',
-							description: 'An error occured while removing the user from the notify list',
+							description: 'An error occurred while removing the user from the notify list',
 							color: '#e74c3c',
 						},
 					)], ephemeral: true,
