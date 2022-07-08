@@ -45,7 +45,7 @@ module.exports = {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Detected',
+						title: 'Incident Detected',
 						description: `${interaction.member.user} tried to use the addrole command but did not have the Founders role.
 						Detailed information:
 						Message Link : ${messageLink}
@@ -59,7 +59,7 @@ module.exports = {
 			return interaction.reply({
 				embeds: [ embedcreator.setembed(
 					{
-						title: 'Incedent Reported',
+						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
 						color: '#e74c3c',
 					},
@@ -104,8 +104,9 @@ module.exports = {
 				const channel = global.client.channels.cache.get(channelId);
 				const message = await channel.messages.fetch(messageId);
 				// Add to roles table if it doesn't exist
-				const db = await mariadb.getConnection();
+				db = await mariadb.getConnection();
 				await db.query('INSERT INTO roles (id, emoji, raw_emoji, message_id, channel_id) VALUES (?, ?, ?, ?, ?)', [roleid, emojiname, emoji, messageId, channelId]);
+				db.end();
 				message.react(emoji).then(() => {
 					console.log(`Added ${emojiname} to database`);
 					interaction.reply({
@@ -167,9 +168,10 @@ module.exports = {
 					return;
 				}
 				console.log(`roleId: ${roleid}`);
-				const db = await mariadb.getConnection();
-				// get messige id from the role database
+				db = await mariadb.getConnection();
+				// get message id from the role database
 				const result = await db.query('SELECT * FROM roles WHERE id = ?', [roleid]);
+				db.end();
 				if (result.length === 0) {
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
@@ -195,7 +197,9 @@ module.exports = {
 				const message = await global.client.channels.cache.get(channel).messages.fetch(messageId);
 				// remove the role from the message
 				// remove the role from the table roles if it exists
+
 				await db.query('DELETE FROM roles WHERE id = ?', [roleid]);
+				db.end();
 				// lookup emoji id in guild
 				message.reactions.cache.get(emojiId).remove().then(() => {
 					console.log(`Removed ${roleName} from database`);

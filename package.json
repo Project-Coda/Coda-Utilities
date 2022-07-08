@@ -1,12 +1,12 @@
 {
   "name": "coda-utilities",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
     "test": "nodemon ."
   },
-  "author": "",
+  "author": "ikifar2012",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.19.0",

@@ -28,6 +28,7 @@ global.client.once('ready', async () => {
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
 	// create notify table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
+	db.end();
 }
 )();
 const commands = [];
@@ -95,7 +96,9 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
+	db = await mariadb.getConnection();
 	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+	db.end();
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
 	const roleName = guild.roles.cache.get(roleId).name;
@@ -122,7 +125,9 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
+	db = await mariadb.getConnection();
 	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+	db.end();
 	if (role.length === 0) return;
 	const roleId = String(role[0].id);
 	const member = guild.members.cache.get(user.id);
