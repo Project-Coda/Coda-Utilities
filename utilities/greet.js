@@ -4,10 +4,13 @@ const embedcreator = require('../embed.js');
 // get users from database and put id's in array
 async function getUsers() {
 	db = await mariadb.getConnection();
-	[rows] = await db.query('SELECT user_id FROM notify');
-	uservalues = Object.values(await rows);
+	rows = await db.query('SELECT user_id FROM notify');
+	users = [];
+	for (row of rows) {
+		users.push(row.user_id);
+	}
 	db.end();
-	return uservalues;
+	return users;
 }
 
 async function sendNotify(member) {

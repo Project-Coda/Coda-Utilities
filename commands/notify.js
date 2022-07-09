@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
+const greet = require('../utilities/greet.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('notify')
@@ -25,26 +26,15 @@ module.exports = {
 						.setName('user-id')
 						.setDescription('id of the user you want to remove')
 						.setRequired(true)),
+		)
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('list')
+				.setDescription('lists all users in the notify list'),
 		),
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		console.log(subcommand);
-		const userinput = interaction.options.get('user-id').value;
-		// clean user id
-		const userId = userinput.replace(/[^0-9.]+/g, '');
-		// get user from discord
-		const user = global.client.users.cache.get(userId);
-		if (!user) {
-			interaction.reply({
-				embeds: [ embedcreator.setembed(
-					{
-						title: 'Error',
-						description: 'Please enter a valid user',
-						color: '#e74c3c',
-					},
-				)], ephemeral: true,
-			});
-		}
 		// Limit command to Founders and Mods
 		if (!(interaction.member.roles.cache.has(env.discord.admin_role) || interaction.member.roles.cache.has(env.discord.mod_role))) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
@@ -70,7 +60,57 @@ module.exports = {
 				], ephemeral: true,
 			});
 		}
+		if (subcommand === 'list') {
+			try {
+				const users = await greet.getUsers();
+				usernames = [];
+				for (user of users) {
+					user = await global.client.users.fetch(user);
+					usernames.push(user);
+				}
+
+				interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Notify List',
+							description: usernames.join('\n'),
+							color: '#19ebfe',
+						},
+					)],
+				});
+
+			}
+			catch (error) {
+				console.log(error);
+				return interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Error',
+							description: 'An error occurred while trying to get the notify list',
+							color: '#e74c3c',
+						},
+					)], ephemeral: true,
+				});
+			}
+		}
+
 		if (subcommand === 'add') {
+			const userinput = interaction.options.get('user-id').value;
+			// clean user id
+			const userId = userinput.replace(/[^0-9.]+/g, '');
+			// get user from discord
+			const user = global.client.users.cache.get(userId);
+			if (!user) {
+				interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Error',
+							description: 'Please enter a valid user',
+							color: '#e74c3c',
+						},
+					)], ephemeral: true,
+				});
+			}
 			try {
 			// check if user in notify table
 				const db = await mariadb.getConnection();
@@ -112,6 +152,22 @@ module.exports = {
 			}
 		}
 		if (subcommand === 'remove') {
+			const userinput = interaction.options.get('user-id').value;
+			// clean user id
+			const userId = userinput.replace(/[^0-9.]+/g, '');
+			// get user from discord
+			const user = global.client.users.cache.get(userId);
+			if (!user) {
+				interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Error',
+							description: 'Please enter a valid user',
+							color: '#e74c3c',
+						},
+					)], ephemeral: true,
+				});
+			}
 			try {
 			// check if user in notify table
 				const db = await mariadb.getConnection();
