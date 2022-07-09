@@ -35,24 +35,6 @@ module.exports = {
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		console.log(subcommand);
-		if (subcommand.name === 'add' || subcommand.name === 'remove') {
-			const userinput = interaction.options.get('user-id').value;
-			// clean user id
-			const userId = userinput.replace(/[^0-9.]+/g, '');
-			// get user from discord
-			const user = global.client.users.cache.get(userId);
-			if (!user) {
-				interaction.reply({
-					embeds: [ embedcreator.setembed(
-						{
-							title: 'Error',
-							description: 'Please enter a valid user',
-							color: '#e74c3c',
-						},
-					)], ephemeral: true,
-				});
-			}
-		}
 		// Limit command to Founders and Mods
 		if (!(interaction.member.roles.cache.has(env.discord.admin_role) || interaction.member.roles.cache.has(env.discord.mod_role))) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
@@ -113,6 +95,22 @@ module.exports = {
 		}
 
 		if (subcommand === 'add') {
+			const userinput = interaction.options.get('user-id').value;
+			// clean user id
+			const userId = userinput.replace(/[^0-9.]+/g, '');
+			// get user from discord
+			const user = global.client.users.cache.get(userId);
+			if (!user) {
+				interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Error',
+							description: 'Please enter a valid user',
+							color: '#e74c3c',
+						},
+					)], ephemeral: true,
+				});
+			}
 			try {
 			// check if user in notify table
 				const db = await mariadb.getConnection();
@@ -154,6 +152,22 @@ module.exports = {
 			}
 		}
 		if (subcommand === 'remove') {
+			const userinput = interaction.options.get('user-id').value;
+			// clean user id
+			const userId = userinput.replace(/[^0-9.]+/g, '');
+			// get user from discord
+			const user = global.client.users.cache.get(userId);
+			if (!user) {
+				interaction.reply({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'Error',
+							description: 'Please enter a valid user',
+							color: '#e74c3c',
+						},
+					)], ephemeral: true,
+				});
+			}
 			try {
 			// check if user in notify table
 				const db = await mariadb.getConnection();

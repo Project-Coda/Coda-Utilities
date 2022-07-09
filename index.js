@@ -25,7 +25,7 @@ global.client.once('ready', async () => {
 	// only for testing
 	// await db.query('DROP TABLE IF EXISTS roles');
 	// create roles table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id VARCHAR(255), channel_id VARCHAR(255))');
+	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id VARCHAR(255), channel_id VARCHAR(255)) COLLATE utf8mb4_general_ci CHARSET utf8mb4;');
 	// create notify table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
 	db.end();
@@ -94,21 +94,21 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
-	const emoji = reaction.emoji.name;
+	const emoji = String(reaction.emoji.name);
 	// query db for role
 	try {
 		db = await mariadb.getConnection();
-		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+		const role = await db.query(`SELECT * FROM roles WHERE raw_emoji = '${emoji}'`);
 		db.end();
-		if (role.length === 0) return;
 		const roleId = String(role[0].id);
 		console.log(role);
-		const roleName = guild.roles.cache.get(roleId).name;
+		console.log(roleId);
+		const roleName = await guild.roles.cache.get(roleId).name;
 		const member = guild.members.cache.get(user.id);
 		if (member) {
 			member.roles.add(roleId);
 		}
-		console.log(`${user.username} reacted to ${roleName} in ${guild.name}`);
+		console.log(`${user.username} reacted to ${roleName} in ${guild.name} with ${emoji}`);
 	}
 	catch (error) {
 		console.error(error);
@@ -141,6 +141,6 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	if (member) {
 		member.roles.remove(roleId);
 	}
-	console.log(`${user.username} un-reacted to ${roleName} in ${guild.name}`);
+	console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
 },
 );
