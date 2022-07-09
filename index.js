@@ -23,9 +23,9 @@ global.client.once('ready', async () => {
 	db = await mariadb.getConnection();
 	// drop table if it exists
 	// only for testing
-	// await db.query('DROP TABLE IF EXISTS notify');
+	// await db.query('DROP TABLE IF EXISTS roles');
 	// create roles table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS roles (id BIGINT PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id BIGINT, channel_id BIGINT)');
+	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id VARCHAR(255), channel_id VARCHAR(255))');
 	// create notify table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
 	db.end();
@@ -96,17 +96,23 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const guild = channel.guild;
 	const emoji = reaction.emoji.name;
 	// query db for role
-	db = await mariadb.getConnection();
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
-	db.end();
-	if (role.length === 0) return;
-	const roleId = String(role[0].id);
-	const roleName = guild.roles.cache.get(roleId).name;
-	const member = guild.members.cache.get(user.id);
-	if (member) {
-		member.roles.add(roleId);
+	try {
+		db = await mariadb.getConnection();
+		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+		db.end();
+		if (role.length === 0) return;
+		const roleId = String(role[0].id);
+		console.log(role);
+		const roleName = guild.roles.cache.get(roleId).name;
+		const member = guild.members.cache.get(user.id);
+		if (member) {
+			member.roles.add(roleId);
+		}
+		console.log(`${user.username} reacted to ${roleName} in ${guild.name}`);
 	}
-	console.log(`${user.username} reacted to ${roleName} in ${guild.name}`);
+	catch (error) {
+		console.error(error);
+	}
 },
 );
 global.client.on('messageReactionRemove', async (reaction, user) => {
