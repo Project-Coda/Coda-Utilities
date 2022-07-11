@@ -5,6 +5,7 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
+const emojiUnicode = require('emoji-unicode');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -94,11 +95,18 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
-	const emoji = String(reaction.emoji.name);
+	console.log(reaction.emoji);
+	if (reaction.emoji.id) {
+		emoji = reaction.emoji.name;
+	}
+	else {
+		emoji = emojiUnicode(reaction.emoji.name);
+	}
+	console.log(emoji);
 	// query db for role
 	try {
 		db = await mariadb.getConnection();
-		const role = await db.query(`SELECT * FROM roles WHERE raw_emoji = '${emoji}'`);
+		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 		db.end();
 		const roleId = String(role[0].id);
 		console.log(role);
@@ -126,21 +134,42 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 			return;
 		}
 	}
-	const message = reaction.message;
-	const channel = message.channel;
-	const guild = channel.guild;
-	const emoji = reaction.emoji.name;
-	// query db for role
-	db = await mariadb.getConnection();
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
-	db.end();
-	if (role.length === 0) return;
-	const roleId = String(role[0].id);
-	const member = guild.members.cache.get(user.id);
-	const roleName = guild.roles.cache.get(roleId).name;
-	if (member) {
-		member.roles.remove(roleId);
+	try {
+		const message = reaction.message;
+		const channel = message.channel;
+		const guild = channel.guild;
+		console.log(reaction.emoji);
+		if (reaction.emoji.id) {
+			emoji = reaction.emoji.name;
+		}
+		else {
+			emoji = emojiUnicode(reaction.emoji.name);
+		}
+		console.log(emoji);
+		// query db for role
+		db = await mariadb.getConnection();
+		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+		db.end();
+		if (role.length === 0) return;
+		const roleId = String(role[0].id);
+		const member = guild.members.cache.get(user.id);
+		const roleName = guild.roles.cache.get(roleId).name;
+		if (member) {
+			try {
+				member.roles.remove(roleId);
+			}
+			catch (error) {
+				console.error(error);
+			}
+		}
+
+		console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
 	}
-	console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
+	catch (error) {
+		console.error(error);
+		// send error to discord
+		const channel = global.client.channels.cache.get(env.discord.logs_channel);
+		channel.send(error);
+	}
 },
 );

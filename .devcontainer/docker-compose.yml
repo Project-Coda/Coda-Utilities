@@ -29,9 +29,6 @@ services:
   db:
     image: mariadb
     restart: always
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
     volumes:
       - data:/var/lib/mysql
     environment:

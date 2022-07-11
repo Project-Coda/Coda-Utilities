@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
+const emojiUnicode = require('emoji-unicode');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reaction')
@@ -75,7 +76,7 @@ module.exports = {
 					emojiname = emoji.split(':')[1].split('>')[0];
 				}
 				else {
-					emojiname = emoji;
+					emojiname = emojiUnicode(emoji);
 				}
 				// extract the channel id from the message link
 				const channelId = messageLink.split('/')[5];
@@ -105,6 +106,7 @@ module.exports = {
 				const message = await channel.messages.fetch(messageId);
 				// Add to roles table if it doesn't exist
 				db = await mariadb.getConnection();
+				await db.query('SET NAMES utf8mb4');
 				await db.query('INSERT INTO roles (id, emoji, raw_emoji, message_id, channel_id) VALUES (?, ?, ?, ?, ?)', [roleid, emojiname, emoji, messageId, channelId]);
 				db.end();
 				message.react(emoji).then(() => {

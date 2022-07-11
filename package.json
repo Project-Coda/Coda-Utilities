@@ -4,7 +4,8 @@
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon ."
+    "test": "nodemon .",
+    "start": "node index.js"
   },
   "author": "ikifar2012",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "@discordjs/rest": "^0.5.0",
     "discord-api-types": "^0.36.1",
     "discord.js": "^13.8.1",
+    "emoji-unicode": "^2.0.1",
     "lodash": "^4.17.21",
     "mariadb": "^3.0.0"
   }
