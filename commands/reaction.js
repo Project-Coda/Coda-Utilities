@@ -110,7 +110,8 @@ module.exports = {
 				await db.query('INSERT INTO roles (id, emoji, raw_emoji, message_id, channel_id) VALUES (?, ?, ?, ?, ?)', [roleid, emojiname, emoji, messageId, channelId]);
 				db.end();
 				message.react(emoji).then(() => {
-					console.log(`Added ${emojiname} to database`);
+					console.log(`Added ${emoji} to database`);
+					embedcreator.log(`Added role ${roleName} to message ${messageLink}`);
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
@@ -125,6 +126,7 @@ module.exports = {
 				},
 				).catch(err => {
 					console.log(err);
+					embedcreator.sendError(`Error adding role ${roleName} to message ${messageLink}`);
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
@@ -140,6 +142,7 @@ module.exports = {
 			}
 			catch (err) {
 				console.log(err);
+				embedcreator.sendError(`${err.text}`);
 				interaction.reply({
 					embeds: [ embedcreator.setembed(
 						{
@@ -204,11 +207,12 @@ module.exports = {
 				db.end();
 				// lookup emoji id in guild
 				message.reactions.cache.get(emojiId).remove().then(() => {
-					console.log(`Removed ${roleName} from database`);
+					embedcreator.log(`Removed ${roleName} from the database`);
+					console.log(`Removed ${roleName} from the database`);
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
-								title: 'Added Role',
+								title: 'Removed Role',
 								description: `Removed ${roleName} from the database`,
 								color: '#2ecc71',
 							},
@@ -218,6 +222,7 @@ module.exports = {
 				},
 				).catch(err => {
 					console.log(err);
+					embedcreator.sendError(`Error removing ${roleName} from database`);
 					interaction.reply({
 						embeds: [ embedcreator.setembed(
 							{
@@ -233,6 +238,7 @@ module.exports = {
 			}
 			catch (err) {
 				console.log(err);
+				embedcreator.sendError(`${err.text}`);
 				interaction.reply({
 					embeds: [ embedcreator.setembed(
 						{

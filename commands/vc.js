@@ -122,6 +122,7 @@ module.exports = {
 		}
 		catch (error) {
 			console.log(error);
+			embedcreator.sendError(error);
 			interaction.reply({
 				embeds: [ embedcreator.setembed(
 					{

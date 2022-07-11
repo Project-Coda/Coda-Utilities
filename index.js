@@ -5,6 +5,7 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
+const embedcreator = require('./embed.js');
 const emojiUnicode = require('emoji-unicode');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
@@ -60,6 +61,7 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 	}
 	catch (error) {
 		console.error(error);
+		embedcreator.sendError(error);
 	}
 })();
 
@@ -89,6 +91,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		}
 		catch (error) {
 			console.error('Something went wrong when fetching the message:', error);
+			embedcreator.sendError(error);
 			return;
 		}
 	}
@@ -114,12 +117,19 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		const roleName = await guild.roles.cache.get(roleId).name;
 		const member = guild.members.cache.get(user.id);
 		if (member) {
-			member.roles.add(roleId);
+			try {
+				member.roles.add(roleId);
+			}
+			catch (error) {
+				console.error(error);
+				embedcreator.sendError(error);
+			}
 		}
 		console.log(`${user.username} reacted to ${roleName} in ${guild.name} with ${emoji}`);
 	}
 	catch (error) {
 		console.error(error);
+		embedcreator.sendError(error);
 	}
 },
 );
@@ -131,6 +141,7 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 		}
 		catch (error) {
 			console.error('Something went wrong when fetching the message:', error);
+			embedcreator.sendError(error);
 			return;
 		}
 	}
@@ -168,8 +179,13 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	catch (error) {
 		console.error(error);
 		// send error to discord
-		const channel = global.client.channels.cache.get(env.discord.logs_channel);
-		channel.send(error);
+		embedcreator.sendError(error);
 	}
+},
+);
+process.on('unhandledRejection', error => {
+	console.error(error);
+	// send error to discord
+	embedcreator.sendError(error);
 },
 );
