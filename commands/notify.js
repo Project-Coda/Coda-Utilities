@@ -76,7 +76,7 @@ module.exports = {
 							description: usernames.join('\n'),
 							color: '#19ebfe',
 						},
-					)],
+					)], ephemeral: true,
 				});
 
 			}
