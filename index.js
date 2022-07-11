@@ -126,6 +126,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 			}
 		}
 		console.log(`${user.username} reacted to ${roleName} in ${guild.name} with ${emoji}`);
+		embedcreator.log(`${user} reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
 	catch (error) {
 		console.error(error);
@@ -175,6 +176,7 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 		}
 
 		console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
+		embedcreator.log(`${user} un-reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
 	catch (error) {
 		console.error(error);
