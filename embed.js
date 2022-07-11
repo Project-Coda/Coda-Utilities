@@ -32,7 +32,7 @@ var log = function(message){
 	const embed = setembed({
 		title: 'Log',
 		description: `${message}`,
-		color: '#2ecc71',
+		color: '#19ebfe',
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
 };
