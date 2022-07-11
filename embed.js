@@ -15,4 +15,25 @@ var setembed = function(opts){
 	};
 	return merge (embed, opts);
 };
-module.exports = { setembed };
+var sendError = function(message){
+	try {
+		const embed = setembed({
+			title: 'Error',
+			description: `${message}`,
+			color: '#e74c3c',
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+	}
+};
+var log = function(message){
+	const embed = setembed({
+		title: 'Log',
+		description: `${message}`,
+		color: '#19ebfe',
+	});
+	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+};
+module.exports = { setembed, sendError, log };

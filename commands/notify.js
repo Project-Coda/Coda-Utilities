@@ -76,7 +76,7 @@ module.exports = {
 							description: usernames.join('\n'),
 							color: '#19ebfe',
 						},
-					)],
+					)], ephemeral: true,
 				});
 
 			}
@@ -197,6 +197,7 @@ module.exports = {
 			}
 			catch (error) {
 				console.log(error);
+				embedcreator.sendError(error);
 				return interaction.reply({
 					embeds: [ embedcreator.setembed(
 						{

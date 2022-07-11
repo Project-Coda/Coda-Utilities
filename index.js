@@ -5,6 +5,8 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
+const embedcreator = require('./embed.js');
+const emojiUnicode = require('emoji-unicode');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -59,6 +61,7 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 	}
 	catch (error) {
 		console.error(error);
+		embedcreator.sendError(error);
 	}
 })();
 
@@ -88,17 +91,25 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		}
 		catch (error) {
 			console.error('Something went wrong when fetching the message:', error);
+			embedcreator.sendError(error);
 			return;
 		}
 	}
 	const message = reaction.message;
 	const channel = message.channel;
 	const guild = channel.guild;
-	const emoji = String(reaction.emoji.name);
+	console.log(reaction.emoji);
+	if (reaction.emoji.id) {
+		emoji = reaction.emoji.name;
+	}
+	else {
+		emoji = emojiUnicode(reaction.emoji.name);
+	}
+	console.log(emoji);
 	// query db for role
 	try {
 		db = await mariadb.getConnection();
-		const role = await db.query(`SELECT * FROM roles WHERE raw_emoji = '${emoji}'`);
+		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 		db.end();
 		const roleId = String(role[0].id);
 		console.log(role);
@@ -106,12 +117,20 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		const roleName = await guild.roles.cache.get(roleId).name;
 		const member = guild.members.cache.get(user.id);
 		if (member) {
-			member.roles.add(roleId);
+			try {
+				member.roles.add(roleId);
+			}
+			catch (error) {
+				console.error(error);
+				embedcreator.sendError(error);
+			}
 		}
 		console.log(`${user.username} reacted to ${roleName} in ${guild.name} with ${emoji}`);
+		embedcreator.log(`${user} reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
 	catch (error) {
 		console.error(error);
+		embedcreator.sendError(error);
 	}
 },
 );
@@ -123,24 +142,52 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 		}
 		catch (error) {
 			console.error('Something went wrong when fetching the message:', error);
+			embedcreator.sendError(error);
 			return;
 		}
 	}
-	const message = reaction.message;
-	const channel = message.channel;
-	const guild = channel.guild;
-	const emoji = reaction.emoji.name;
-	// query db for role
-	db = await mariadb.getConnection();
-	const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
-	db.end();
-	if (role.length === 0) return;
-	const roleId = String(role[0].id);
-	const member = guild.members.cache.get(user.id);
-	const roleName = guild.roles.cache.get(roleId).name;
-	if (member) {
-		member.roles.remove(roleId);
+	try {
+		const message = reaction.message;
+		const channel = message.channel;
+		const guild = channel.guild;
+		console.log(reaction.emoji);
+		if (reaction.emoji.id) {
+			emoji = reaction.emoji.name;
+		}
+		else {
+			emoji = emojiUnicode(reaction.emoji.name);
+		}
+		console.log(emoji);
+		// query db for role
+		db = await mariadb.getConnection();
+		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
+		db.end();
+		if (role.length === 0) return;
+		const roleId = String(role[0].id);
+		const member = guild.members.cache.get(user.id);
+		const roleName = guild.roles.cache.get(roleId).name;
+		if (member) {
+			try {
+				member.roles.remove(roleId);
+			}
+			catch (error) {
+				console.error(error);
+			}
+		}
+
+		console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
+		embedcreator.log(`${user} un-reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
-	console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
+	catch (error) {
+		console.error(error);
+		// send error to discord
+		embedcreator.sendError(error);
+	}
+},
+);
+process.on('unhandledRejection', error => {
+	console.error(error);
+	// send error to discord
+	embedcreator.sendError(error);
 },
 );
