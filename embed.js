@@ -3,9 +3,9 @@ const merge = require('lodash.merge');
 var setembed = function(opts){
 	var embed = {
 		// Discord Embed Template Coda
-		color: 0x00ff00,
 		title: '',
 		description: '',
+		color: '#19ebfe',
 		url: '',
 		timestamp: `${new Date()}`,
 		footer: {
