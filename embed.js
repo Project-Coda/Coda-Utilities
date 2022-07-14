@@ -3,9 +3,9 @@ const merge = require('lodash.merge');
 var setembed = function(opts){
 	var embed = {
 		// Discord Embed Template Coda
-		color: 0x00ff00,
 		title: '',
 		description: '',
+		color: '#19ebfe',
 		url: '',
 		timestamp: `${new Date()}`,
 		footer: {
@@ -17,7 +17,7 @@ var setembed = function(opts){
 };
 var sendError = function(message){
 	try {
-		const embed = setembed({
+		var embed = setembed({
 			title: 'Error',
 			description: `${message}`,
 			color: '#e74c3c',
@@ -29,11 +29,19 @@ var sendError = function(message){
 	}
 };
 var log = function(message){
-	const embed = setembed({
+	var embed = setembed({
 		title: 'Log',
 		description: `${message}`,
 		color: '#19ebfe',
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
 };
-module.exports = { setembed, sendError, log };
+var alert = function(message){
+	var embed = setembed({
+		title: '🚨 Alert 🚨',
+		description: `${message}`,
+		color: '#e74c3c',
+	});
+	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>', embeds: [embed] });
+};
+module.exports = { setembed, sendError, log, alert };

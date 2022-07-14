@@ -7,11 +7,22 @@ const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
 const embedcreator = require('./embed.js');
 const emojiUnicode = require('emoji-unicode');
+const figlet = require('figlet');
+const botgate = require('./utilities/botgate.js');
+const pkg = require('./package.json');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 global.client.login(env.discord.token);
+console.log(figlet.textSync('CODA UTILITIES', {
+	font: 'Standard',
+	horizontalLayout: 'default',
+	verticalLayout: 'default',
+}));
+console.log(`Version: ${pkg.version}`);
+console.log(`Author: ${pkg.author}`);
+console.log(`GitHub: ${pkg.repository.url}`);
 global.client.once('ready', async () => {
 	console.log('Ready!');
 	// get the number of users in the server
@@ -30,6 +41,8 @@ global.client.once('ready', async () => {
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id VARCHAR(255), channel_id VARCHAR(255)) COLLATE utf8mb4_general_ci CHARSET utf8mb4;');
 	// create notify table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
+	// create settings table if it doesn't exist
+	await db.query('CREATE TABLE IF NOT EXISTS settings (setting VARCHAR(255) PRIMARY KEY, value BOOLEAN)');
 	db.end();
 }
 )();
@@ -66,10 +79,29 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 })();
 
 global.client.on('guildMemberAdd', async member => {
-	const guild = global.client.guilds.cache.get(env.discord.guild);
 
+	// check if member is a bot
+	if (member.user.bot) {
+		botgatestatus = await botgate.status();
+		console.log(`${member.user.tag} is a bot.`);
+		if (botgatestatus === true) {
+			console.log('Botgate is enabled.');
+			console.log('Kicking bot...');
+			member.kick('Botgate is enabled.');
+			console.log('Kicked bot.');
+			return greet.sendKickAlert(member);
+		}
+		else {
+			console.log('Botgate is disabled.');
+			const guild = global.client.guilds.cache.get(env.discord.guild);
+			const members = await guild.members.fetch();
+			global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+			return greet.SendNewBotAlert(member);
+		}
+	}
 	greet.sendNotify(member);
 	// Update presence
+	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();
 	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
 },
