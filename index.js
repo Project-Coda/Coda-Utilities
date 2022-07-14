@@ -69,6 +69,7 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 })();
 
 global.client.on('guildMemberAdd', async member => {
+
 	// check if member is a bot
 	if (member.user.bot) {
 		botgatestatus = await botgate.status();
@@ -82,13 +83,15 @@ global.client.on('guildMemberAdd', async member => {
 		}
 		else {
 			console.log('Botgate is disabled.');
+			const guild = global.client.guilds.cache.get(env.discord.guild);
+			const members = await guild.members.fetch();
+			global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+			return greet.SendNewBotAlert(member);
 		}
-
 	}
-	const guild = global.client.guilds.cache.get(env.discord.guild);
-
 	greet.sendNotify(member);
 	// Update presence
+	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();
 	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
 },
