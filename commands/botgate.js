@@ -64,11 +64,12 @@ module.exports = {
 					db = await mariadb.getConnection();
 					db.query('UPDATE settings SET value = ? WHERE setting = ?', [1, 'botgate']);
 					db.end();
+					embedcreator.alert(`Botgate Enabled by ${interaction.member.user}`);
 					return interaction.reply({
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Enabled',
 							description: 'Botgate is now enabled.',
-							color: '#19ebfe',
+							color: '#2ecc71',
 						})], ephemeral: true,
 					});
 				}
@@ -76,11 +77,12 @@ module.exports = {
 					db = await mariadb.getConnection();
 					db.query('UPDATE settings SET value = ? WHERE setting = ?', [0, 'botgate']);
 					db.end();
+					embedcreator.alert(`Botgate Disabled by ${interaction.member.user}`);
 					return interaction.reply({
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Disabled',
 							description: 'Botgate is now disabled.',
-							color: '#19ebfe',
+							color: '#e74c3c',
 						})], ephemeral: true,
 					});
 				}
@@ -94,7 +96,7 @@ module.exports = {
 					embeds: [embedcreator.setembed({
 						title: 'Botgate Status',
 						description: 'Botgate is enabled.',
-						color: '#19ebfe',
+						color: '#2ecc71',
 					})], ephemeral: true,
 				});
 			}
@@ -103,7 +105,7 @@ module.exports = {
 					embeds: [embedcreator.setembed({
 						title: 'Botgate Status',
 						description: 'Botgate is disabled.',
-						color: '#19ebfe',
+						color: '#e74c3c',
 					})], ephemeral: true,
 				});
 			}
