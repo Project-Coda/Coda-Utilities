@@ -54,7 +54,7 @@ async function sendKickAlert(member) {
 			},
 		);
 	}
-	global.client.users.cache.get(env.discord.logs_channel).send(
+	global.client.channels.cache.get(env.discord.logs_channel).send(
 		{
 			content: '🚨 Bot Kicked from Server 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>',
 			embeds: [ embedcreator.setembed(
