@@ -17,7 +17,7 @@ var setembed = function(opts){
 };
 var sendError = function(message){
 	try {
-		const embed = setembed({
+		var embed = setembed({
 			title: 'Error',
 			description: `${message}`,
 			color: '#e74c3c',
@@ -29,7 +29,7 @@ var sendError = function(message){
 	}
 };
 var log = function(message){
-	const embed = setembed({
+	var embed = setembed({
 		title: 'Log',
 		description: `${message}`,
 		color: '#19ebfe',
