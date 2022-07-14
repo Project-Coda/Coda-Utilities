@@ -7,12 +7,22 @@ const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
 const embedcreator = require('./embed.js');
 const emojiUnicode = require('emoji-unicode');
+const figlet = require('figlet');
 const botgate = require('./utilities/botgate.js');
+const pkg = require('./package.json');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 global.client.login(env.discord.token);
+console.log(figlet.textSync('CODA UTILITIES', {
+	font: 'Standard',
+	horizontalLayout: 'default',
+	verticalLayout: 'default',
+}));
+console.log(`Version: ${pkg.version}`);
+console.log(`Author: ${pkg.author}`);
+console.log(`GitHub: ${pkg.repository.url}`);
 global.client.once('ready', async () => {
 	console.log('Ready!');
 	// get the number of users in the server
