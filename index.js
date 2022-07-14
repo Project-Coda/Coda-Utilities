@@ -7,6 +7,7 @@ const mariadb = require('./db.js');
 const greet = require('./utilities/greet.js');
 const embedcreator = require('./embed.js');
 const emojiUnicode = require('emoji-unicode');
+const botgate = require('./utilities/botgate.js');
 global.client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -68,6 +69,22 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 })();
 
 global.client.on('guildMemberAdd', async member => {
+	// check if member is a bot
+	if (member.user.bot) {
+		botgatestatus = await botgate.status();
+		console.log(`${member.user.tag} is a bot.`);
+		if (botgatestatus === true) {
+			console.log('Botgate is enabled.');
+			console.log('Kicking bot...');
+			member.kick('Botgate is enabled.');
+			console.log('Kicked bot.');
+			return greet.sendKickAlert(member);
+		}
+		else {
+			console.log('Botgate is disabled.');
+		}
+
+	}
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 
 	greet.sendNotify(member);

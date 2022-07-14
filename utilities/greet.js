@@ -34,4 +34,26 @@ async function sendNotify(member) {
 		);
 	}
 }
-module.exports = { sendNotify, getUsers };
+async function sendKickAlert(member) {
+	const users = await getUsers();
+	for (userId of users) {
+		console.log(userId);
+		const user = await global.client.users.fetch(userId);
+		user.send(
+			{
+				embeds: [ embedcreator.setembed(
+					{
+						title: 'Bot Kicked',
+						description: `${member.user} joined ${global.client.guilds.cache.get(env.discord.guild).name} and was kicked due to botgate being enabled`,
+						color: '#e74c3c',
+						image: {
+							url: `${member.user.avatarURL({ dynamic: true })}`,
+						},
+					},
+				)],
+			},
+		);
+
+	}
+}
+module.exports = { sendNotify, getUsers, sendKickAlert };

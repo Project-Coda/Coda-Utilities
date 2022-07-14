@@ -18,7 +18,8 @@ module.exports = {
 				.setDescription('Set the status of the botgate')
 				.addBooleanOption(option =>
 					option.setName('botgate')
-						.setDescription('Enable or disable botgate'),
+						.setDescription('Enable or disable botgate')
+						.setRequired(true),
 				),
 		),
 	async execute(interaction) {
@@ -68,7 +69,7 @@ module.exports = {
 							title: 'Botgate Enabled',
 							description: 'Botgate is now enabled.',
 							color: '#19ebfe',
-						})],
+						})], ephemeral: true,
 					});
 				}
 				if (botgatevalue === false) {
@@ -80,7 +81,7 @@ module.exports = {
 							title: 'Botgate Disabled',
 							description: 'Botgate is now disabled.',
 							color: '#19ebfe',
-						})],
+						})], ephemeral: true,
 					});
 				}
 			}
@@ -94,7 +95,7 @@ module.exports = {
 						title: 'Botgate Status',
 						description: 'Botgate is enabled.',
 						color: '#19ebfe',
-					})],
+					})], ephemeral: true,
 				});
 			}
 			else {
@@ -103,7 +104,7 @@ module.exports = {
 						title: 'Botgate Status',
 						description: 'Botgate is disabled.',
 						color: '#19ebfe',
-					})],
+					})], ephemeral: true,
 				});
 			}
 		}
