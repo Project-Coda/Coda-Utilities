@@ -14,7 +14,7 @@ module.exports = {
 	async execute(interaction) {
 		const chord = interaction.options.get('chord').value;
 		const chordInfo = Chord.get(chord);
-		if (chordInfo) {
+		if (chordInfo && chordInfo.type) {
 			console.log(chordInfo);
 			return interaction.reply({
 				embeds: [embedcreator.setembed({
@@ -24,6 +24,13 @@ module.exports = {
 				})],
 			});
 		}
-
+		embedcreator.log(`${interaction.member.user} used the chord command\nparameters: ${chord}\n error: ${JSON.stringify(chordInfo)}`);
+		return interaction.reply({
+			embeds: [embedcreator.setembed({
+				title: 'Error',
+				description: `Could not find chord ${chord}`,
+				color: '#e74c3c',
+			})],
+		});
 	},
 };
