@@ -36,4 +36,12 @@ var log = function(message){
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
 };
-module.exports = { setembed, sendError, log };
+var alert = function(message){
+	var embed = setembed({
+		title: '🚨 Alert 🚨',
+		description: `${message}`,
+		color: '#e74c3c',
+	});
+	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>', embeds: [embed] });
+};
+module.exports = { setembed, sendError, log, alert };
