@@ -14,7 +14,7 @@
     "url": "https://github.com/Project-Coda/Coda-Utilities.git"
   },
   "devDependencies": {
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "nodemon": "^2.0.19"
   },
   "dependencies": {
