@@ -14,17 +14,17 @@
     "url": "https://github.com/Project-Coda/Coda-Utilities.git"
   },
   "devDependencies": {
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "nodemon": "^2.0.19"
   },
   "dependencies": {
-    "@discordjs/rest": "^0.5.0",
+    "@discordjs/rest": "^1.0.0",
     "@tonaljs/tonal": "^4.6.5",
-    "discord-api-types": "^0.36.2",
-    "discord.js": "^13.8.1",
+    "discord-api-types": "^0.36.3",
+    "discord.js": "^14.0.3",
     "emoji-unicode": "^2.0.1",
     "figlet": "^1.5.2",
     "lodash": "^4.17.21",
-    "mariadb": "^3.0.0"
+    "mariadb": "^3.0.1"
   }
 }
