@@ -1,3 +1,4 @@
+version: '2'
 services:
   db:
     image: mariadb:latest
@@ -10,9 +11,9 @@ services:
       MYSQL_PASSWORD: "mariadb"
     restart: always
   coda-utilites:
-    image: ghcr.io/project-coda/coda-utilites:latest
+    build: .
     volumes:
-      - ./coda-utilities/env.js:/app/env.js
+      - ./env.js:/app/env.js
     depends_on:
       - db
     restart: always
