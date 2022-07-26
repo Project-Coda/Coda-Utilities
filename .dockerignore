@@ -3,3 +3,4 @@ env.js
 .*
 testing/*
 docker-compose.yml
+.db-data/*
