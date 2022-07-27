@@ -28,8 +28,7 @@ module.exports = {
 			})], components: [row],
 		});
 		embedcreator.log(`${interaction.member.user} used the prompt command.`);
-		console.log(interaction);
-		const filter = i => i.customId === 'thanks' && i.user.id === interaction.user.id || i.customId === 'new-prompt' && i.user.id === interaction.user.id;
+		const filter = i => (i.customId === 'thanks' || i.customId === 'new-prompt') && i.user.id === interaction.user.id;
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 		collector.on('collect', async i => {
 			if (i.customId === 'new-prompt') {
