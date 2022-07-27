@@ -28,7 +28,7 @@ module.exports = {
 					{
 						title: 'Incident Detected',
 						description: `${interaction.member.user} tried to use the vc move command but did not have the correct role.`,
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				)],
 			},
@@ -38,7 +38,7 @@ module.exports = {
 					{
 						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				),
 				], ephemeral: true,
@@ -68,7 +68,7 @@ module.exports = {
 								{
 									title: 'Success',
 									description: `Successfully moved ${people} from ${sourcevc} to ${destinationvc}`,
-									color: '#19ebfe',
+									color: 0x19ebfe,
 								},
 							)],
 							ephemeral: true,
@@ -80,7 +80,7 @@ module.exports = {
 								{
 									title: 'Error',
 									description: 'Invalid voice channel',
-									color: '#e74c3c',
+									color: 0xe74c3c,
 								},
 							)],
 							ephemeral: true,
@@ -99,7 +99,7 @@ module.exports = {
 								{
 									title: 'Success',
 									description: `Successfully moved ${people} from ${sourcevcauto} to ${destinationvc}`,
-									color: '#19ebfe',
+									color: 0x19ebfe,
 								},
 							)],
 							ephemeral: true,
@@ -111,7 +111,7 @@ module.exports = {
 								{
 									title: 'Error',
 									description: 'Invalid voice channel',
-									color: '#e74c3c',
+									color: 0xe74c3c,
 								},
 							)],
 							ephemeral: true,
@@ -128,7 +128,7 @@ module.exports = {
 					{
 						title: 'Error',
 						description: 'vc move has crashed. Please report this to the bot owner.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				)],
 				ephemeral: true,

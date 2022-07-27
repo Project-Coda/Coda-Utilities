@@ -30,7 +30,7 @@ module.exports = {
 					{
 						title: 'Incident Detected',
 						description: `${interaction.member.user} tried to use the botgate command but did not have the correct role.`,
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				)],
 			},
@@ -40,7 +40,7 @@ module.exports = {
 					{
 						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				),
 				], ephemeral: true,
@@ -69,7 +69,7 @@ module.exports = {
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Enabled',
 							description: 'Botgate is now enabled.',
-							color: '#2ecc71',
+							color: 0x2ecc71,
 						})], ephemeral: true,
 					});
 				}
@@ -82,7 +82,7 @@ module.exports = {
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Disabled',
 							description: 'Botgate is now disabled.',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						})], ephemeral: true,
 					});
 				}
@@ -96,7 +96,7 @@ module.exports = {
 					embeds: [embedcreator.setembed({
 						title: 'Botgate Status',
 						description: 'Botgate is enabled.',
-						color: '#2ecc71',
+						color: 0x2ecc71,
 					})], ephemeral: true,
 				});
 			}
@@ -105,7 +105,7 @@ module.exports = {
 					embeds: [embedcreator.setembed({
 						title: 'Botgate Status',
 						description: 'Botgate is disabled.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					})], ephemeral: true,
 				});
 			}

@@ -29,7 +29,7 @@ module.exports = {
 			embeds: [embedcreator.setembed({
 				title: 'Error',
 				description: `Could not find chord ${chord}`,
-				color: '#e74c3c',
+				color: 0xe74c3c,
 			})],
 		});
 	},

@@ -44,7 +44,7 @@ module.exports = {
 						description: `${interaction.member.user} tried to use the notify command but did not have the correct role.
                         Detailed information:
                         User ID : ${userId}`,
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				)],
 			},
@@ -54,7 +54,7 @@ module.exports = {
 					{
 						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				),
 				], ephemeral: true,
@@ -74,7 +74,7 @@ module.exports = {
 						{
 							title: 'Notify List',
 							description: usernames.join('\n'),
-							color: '#19ebfe',
+							color: 0x19ebfe,
 						},
 					)], ephemeral: true,
 				});
@@ -87,7 +87,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: 'An error occurred while trying to get the notify list',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					)], ephemeral: true,
 				});
@@ -106,7 +106,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: 'Please enter a valid user',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					)], ephemeral: true,
 				});
@@ -121,7 +121,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: `${user} is already in the notify list`,
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						)], ephemeral: true,
 					});
@@ -133,7 +133,7 @@ module.exports = {
 						{
 							title: 'Success',
 							description: `${user} added to notify list`,
-							color: '#2ecc71',
+							color: 0x2ecc71,
 						},
 					)], ephemeral: true,
 				});
@@ -145,7 +145,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: 'An error occurred while adding the user to the notify list',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					)], ephemeral: true,
 				});
@@ -163,7 +163,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: 'Please enter a valid user',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					)], ephemeral: true,
 				});
@@ -178,7 +178,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: 'User is not in the notify list',
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						)], ephemeral: true,
 					});
@@ -190,7 +190,7 @@ module.exports = {
 						{
 							title: 'Success',
 							description: `${user} removed from notify list`,
-							color: '#2ecc71',
+							color: 0x2ecc71,
 						},
 					)], ephemeral: true,
 				});
@@ -203,7 +203,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: 'An error occurred while removing the user from the notify list',
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					)], ephemeral: true,
 				});
