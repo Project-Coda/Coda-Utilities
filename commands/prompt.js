@@ -28,11 +28,12 @@ module.exports = {
 			})], components: [row],
 		});
 		embedcreator.log(`${interaction.member.user} used the prompt command.`);
-		writingprompt = await prompt.getPrompt();
-		const filter = i => i.customId === 'thanks' || i.customId === 'new-prompt';
-		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+		console.log(interaction);
+		const filter = i => i.customId === 'thanks' && i.user.id === interaction.user.id || i.customId === 'new-prompt' && i.user.id === interaction.user.id;
+		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 		collector.on('collect', async i => {
 			if (i.customId === 'new-prompt') {
+				writingprompt = await prompt.getPrompt();
 				i.deferUpdate();
 				await interaction.editReply({
 					embeds: [embedcreator.setembed({
@@ -46,5 +47,11 @@ module.exports = {
 				await interaction.deleteReply();
 			}
 		});
+		collector.on('end', async collected => {
+			if (collected.size === 0) {
+				await interaction.deleteReply();
+			}
+		},
+		);
 	},
 };
