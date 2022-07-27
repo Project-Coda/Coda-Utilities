@@ -1,4 +1,4 @@
-const { Client, Intents } = require('discord.js');
+const { Client, GatewayIntentBits, Partials } = require('discord.js');
 const env = require('./env.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -11,8 +11,8 @@ const figlet = require('figlet');
 const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
 global.client = new Client({
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
-	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 global.client.login(env.discord.token);
 console.log(figlet.textSync('CODA UTILITIES', {
@@ -108,7 +108,7 @@ global.client.on('guildMemberAdd', async member => {
 );
 
 global.client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+	if (!interaction.isChatInputCommand()) return;
 	console.log(interaction.commandName);
 	const commandFile = `./commands/${interaction.commandName}.js`;
 	if (!fs.existsSync(commandFile)) return;

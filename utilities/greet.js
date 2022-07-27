@@ -24,7 +24,7 @@ async function sendNotify(member) {
 					{
 						title: 'New Member',
 						description: `${member.user} has joined ${global.client.guilds.cache.get(env.discord.guild).name}`,
-						color: '#19ebfe',
+						color: 0x19ebfe,
 						image: {
 							url: `${member.user.avatarURL({ dynamic: true })}`,
 						},
@@ -45,7 +45,7 @@ async function sendKickAlert(member) {
 					{
 						title: '🚨 Bot Kicked 🚨',
 						description: `${member.user} joined ${global.client.guilds.cache.get(env.discord.guild).name} and was kicked due to botgate being enabled`,
-						color: '#e74c3c',
+						color: 0xe74c3c,
 						image: {
 							url: `${member.user.avatarURL({ dynamic: true })}`,
 						},
@@ -61,7 +61,7 @@ async function sendKickAlert(member) {
 				{
 					title: 'Bot Kicked',
 					description: `${member.user} joined ${global.client.guilds.cache.get(env.discord.guild).name} and was kicked due to botgate being enabled`,
-					color: '#e74c3c',
+					color: 0xe74c3c,
 					image: {
 						url: `${member.user.avatarURL({ dynamic: true })}`,
 					},
@@ -82,7 +82,7 @@ async function SendNewBotAlert(member) {
 					{
 						title: '🚨 Bot Added 🚨',
 						description: `Botgate was disabled and ${member.user} joined ${global.client.guilds.cache.get(env.discord.guild).name}, please re-enable botgate as soon as possible`,
-						color: '#2ecc71',
+						color: 0x2ecc71,
 						image: {
 							url: `${member.user.avatarURL({ dynamic: true })}`,
 						},
@@ -99,7 +99,7 @@ async function SendNewBotAlert(member) {
 				{
 					title: '🚨 Bot Added 🚨',
 					description: `Botgate was disabled and ${member.user} joined ${global.client.guilds.cache.get(env.discord.guild).name}, please re-enable botgate as soon as possible`,
-					color: '#2ecc71',
+					color: 0x2ecc71,
 					image: {
 						url: `${member.user.avatarURL({ dynamic: true })}`,
 					},

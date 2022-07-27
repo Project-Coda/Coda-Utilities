@@ -10,7 +10,7 @@ module.exports = {
 			embeds: [embedcreator.setembed({
 				title: 'Version Information',
 				description: `**Coda Utilities\nVersion:** ${pkg.version}`,
-				color: '#19ebfe',
+				color: 0x19ebfe,
 			})], ephemeral: true,
 		});
 		embedcreator.log(`${interaction.member.user} used the version command.`);

@@ -52,7 +52,7 @@ module.exports = {
 						Message Link : ${messageLink}
 						Role : ${roleName}
 						Emoji : ${emoji}`,
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				)],
 			},
@@ -62,7 +62,7 @@ module.exports = {
 					{
 						title: 'Incident Reported',
 						description: 'You do not have permission to use this command. This incident has been reported.',
-						color: '#e74c3c',
+						color: 0xe74c3c,
 					},
 				),
 				], ephemeral: true,
@@ -92,7 +92,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: 'Please enter a valid role',
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						)], ephemeral: true,
 					});
@@ -118,7 +118,7 @@ module.exports = {
 								title: 'Added Role',
 								url: messageLink,
 								description: `Added role ${roleName} to message ${messageLink}`,
-								color: '#2ecc71',
+								color: 0x2ecc71,
 							},
 						),
 						], ephemeral: true,
@@ -132,7 +132,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: `Error adding role ${roleName} to message ${messageLink}`,
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						),
 						], ephemeral: true,
@@ -148,7 +148,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: `${err.text}`,
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					),
 					], ephemeral: true,
@@ -166,7 +166,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: 'Please enter a valid role',
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						)], ephemeral: true,
 					});
@@ -183,7 +183,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: 'Please enter a valid role',
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						)], ephemeral: true,
 					});
@@ -214,7 +214,7 @@ module.exports = {
 							{
 								title: 'Removed Role',
 								description: `Removed ${roleName} from the database`,
-								color: '#2ecc71',
+								color: 0x2ecc71,
 							},
 						),
 						], ephemeral: true,
@@ -228,7 +228,7 @@ module.exports = {
 							{
 								title: 'Error',
 								description: `Error removing ${roleName} from the database`,
-								color: '#e74c3c',
+								color: 0xe74c3c,
 							},
 						),
 						], ephemeral: true,
@@ -244,7 +244,7 @@ module.exports = {
 						{
 							title: 'Error',
 							description: `${err.text}`,
-							color: '#e74c3c',
+							color: 0xe74c3c,
 						},
 					),
 					], ephemeral: true,
