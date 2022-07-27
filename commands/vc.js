@@ -89,7 +89,7 @@ module.exports = {
 				}
 				else {
 					var sourcevcauto = await global.client.channels.cache.get(interaction.member.voice.channel.id);
-					if (sourcevcauto && sourcevcauto.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
+					if (sourcevcauto && sourcevcauto.type === 2 && destinationvc && destinationvc.type === 2) {
 						await sourcevcauto.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
