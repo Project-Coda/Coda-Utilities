@@ -1,7 +1,6 @@
 const env = require('../env.js');
 const fetch = require('node-fetch');
 async function getList() {
-	console.log('Getting list of prompts...');
 	file = await fetch(env.utilities.promptfile);
 	prompts = await file.text();
 	prompts = prompts.split('\n');
