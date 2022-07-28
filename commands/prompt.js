@@ -47,10 +47,8 @@ module.exports = {
 				await interaction.deleteReply();
 			}
 		});
-		collector.on('end', async collected => {
-			if (collected.size === 0) {
-				await interaction.deleteReply();
-			}
+		collector.on('end', async () => {
+			await interaction.deleteReply();
 		},
 		);
 	},
