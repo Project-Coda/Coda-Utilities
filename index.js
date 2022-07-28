@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
 const env = require('./env.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -29,7 +29,7 @@ global.client.once('ready', async () => {
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();
 	// set the client's presence
-	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+	global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
 });
 
 (async () => {
