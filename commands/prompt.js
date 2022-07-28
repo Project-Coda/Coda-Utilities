@@ -48,7 +48,13 @@ module.exports = {
 			}
 		});
 		collector.on('end', async () => {
-			await interaction.deleteReply();
+			try {
+				await interaction.deleteReply();
+			}
+			catch (error) {
+				console.error(error);
+				embedcreator.sendError(error);
+			}
 		},
 		);
 	},
