@@ -32,9 +32,6 @@ module.exports = {
 		id = interaction.id;
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 		collector.on('collect', async i => {
-			console.log(i.message.interaction.id);
-			console.log(interaction.id);
-			// console.log(interaction.options);
 			if (i.customId === 'new-prompt') {
 				writingprompt = await prompt.getPrompt();
 				i.deferUpdate();
