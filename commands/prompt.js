@@ -28,9 +28,13 @@ module.exports = {
 			})], components: [row],
 		});
 		embedcreator.log(`${interaction.member.user} used the prompt command.`);
-		const filter = i => (i.customId === 'thanks' || i.customId === 'new-prompt') && i.user.id === interaction.user.id;
+		const filter = i => (i.customId === 'thanks' || i.customId === 'new-prompt') && i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
+		id = interaction.id;
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 		collector.on('collect', async i => {
+			console.log(i.message.interaction.id);
+			console.log(interaction.id);
+			// console.log(interaction.options);
 			if (i.customId === 'new-prompt') {
 				writingprompt = await prompt.getPrompt();
 				i.deferUpdate();
