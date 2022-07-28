@@ -26,6 +26,6 @@
     "figlet": "^1.5.2",
     "lodash": "^4.17.21",
     "mariadb": "^3.0.1",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^3.2.9"
   }
 }
