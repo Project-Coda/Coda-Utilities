@@ -95,7 +95,7 @@ global.client.on('guildMemberAdd', async member => {
 			console.log('Botgate is disabled.');
 			const guild = global.client.guilds.cache.get(env.discord.guild);
 			const members = await guild.members.fetch();
-			global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+			global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
 			return greet.SendNewBotAlert(member);
 		}
 	}
@@ -103,7 +103,7 @@ global.client.on('guildMemberAdd', async member => {
 	// Update presence
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();
-	global.client.user.setActivity(`${members.size} members`, { type: 'WATCHING' });
+	global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
 },
 );
 
