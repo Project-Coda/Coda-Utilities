@@ -3,6 +3,9 @@ updates:
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/"
+    ignore:
+      - dependency-name: "node-fetch"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"
