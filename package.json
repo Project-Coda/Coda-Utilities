@@ -1,18 +1,22 @@
 {
   "name": "coda-utilities",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
     "test": "nodemon .",
     "start": "node index.js"
   },
-  "author": "ikifar2012",
+  "author": "Matheson Steplock (ikifar2012)",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/Project-Coda/Coda-Utilities.git"
   },
+  "bugs": {
+    "url": "https://github.com/Project-Coda/Coda-Utilities/issues"
+  },
+  "homepage": "https://github.com/Project-Coda/Coda-Utilities#readme",
   "devDependencies": {
     "eslint": "^8.20.0",
     "nodemon": "^2.0.19"
