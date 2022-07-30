@@ -9,7 +9,7 @@ module.exports = {
 		interaction.reply({
 			embeds: [embedcreator.setembed({
 				title: 'Version Information',
-				description: `**Coda Utilities\nVersion:** ${pkg.version}`,
+				description: `**Coda Utilities**\n**Ping:** ${global.client.ws.ping}ms\n**Version:** ${pkg.version}\n**Author:** ${pkg.author}\n**GitHub:** ${pkg.repository.url}\n**Bug Reports:** ${pkg.bugs.url}`,
 				color: 0x19ebfe,
 			})], ephemeral: true,
 		});
