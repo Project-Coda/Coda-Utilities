@@ -58,7 +58,7 @@ module.exports = {
 					var usersource = interaction.options.get('source').value;
 					var sourceid = usersource.replace(/[^0-9.]+/g, '');
 					var sourcevc = await global.client.channels.cache.get(sourceid);
-					if (sourcevc && sourcevc.type === 'GUILD_VOICE' && destinationvc && destinationvc.type === 'GUILD_VOICE') {
+					if (sourcevc && sourcevc.type === 2 && destinationvc && destinationvc.type === 2) {
 						await sourcevc.members.forEach(member => {
 							member.voice.setChannel(destination);
 							people.push(member);
