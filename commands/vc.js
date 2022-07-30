@@ -18,11 +18,6 @@ module.exports = {
 					option
 						.setName('source')
 						.setDescription('The name of the voice channel to move the users from')
-						.setRequired(false))
-				.addUserOption(option =>
-					option
-						.setName('user')
-						.setDescription('The name of the user to move')
 						.setRequired(false)),
 		),
 	async execute(interaction) {
