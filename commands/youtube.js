@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const play = require('../utilities/play.js');
+const embedcreator = require('../embed.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -33,12 +34,13 @@ module.exports = {
 			channel = await play.joinVC(voiceChannel);
 			player = await play.createPlayer();
 			response = await play.YouTube(player, url, volume, channel);
+			// send embed
 			embed = await play.createEmbed(response);
 			return interaction.reply({ embeds:[embed], ephemeral: true });
 		}
 		catch (error) {
 			console.log(error);
-			return interaction.reply({ content: error, ephemeral: true });
+			return embedcreator.sendError(error);
 		}
 	},
 

@@ -45,13 +45,13 @@ async function YouTube(player, url, volume, channel) {
 		if (volume) {
 			resource.volume.setVolume(volume);
 		}
-		console.log(info.videoDetails.thumbnails);
-		track = new Track(info.videoDetails.title, url, info.videoDetails.author.name, info.videoDetails.thumbnails[4].url);
+		const track = new Track(info.videoDetails.title, url, info.videoDetails.author.name, info.videoDetails.thumbnails[4].url);
+		await NowPlaying(track);
 		return track;
 	}
 	catch (error) {
 		console.log(error);
-		return error;
+		return embedcreator.sendError(error);
 	}
 }
 async function createPlayer() {
@@ -62,6 +62,9 @@ async function createPlayer() {
 		},
 	);
 	return player;
+}
+async function NowPlaying(track) {
+	console.log(`Now Playing: ${track.name} by ${track.artist}`);
 }
 module.exports = {
 	YouTube,
