@@ -26,10 +26,14 @@ module.exports = {
 			// get url
 			const url = interaction.options.get('url').value;
 			// get volume
-			// if (interaction.options.get('volume').value) {
-			// 	volume = interaction.options.get('volume').value;
-			// }
-			volume = 1;
+			if (interaction.options.get('volume')) {
+				volume = interaction.options.get('volume').value;
+				volume = parseInt(volume);
+				volume = volume / 100;
+			}
+			else {
+				volume = 1;
+			}
 			// play song
 			channel = await play.joinVC(voiceChannel);
 			player = await play.createPlayer();

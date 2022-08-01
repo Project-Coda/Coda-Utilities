@@ -42,7 +42,8 @@ async function YouTube(player, url, volume, channel) {
 		});
 		await player.play(resource);
 		await channel.subscribe(player);
-		if (volume) {
+		if (volume != 1) {
+			console.log(`Setting volume to ${volume}`);
 			resource.volume.setVolume(volume);
 		}
 		const track = new Track(info.videoDetails.title, url, info.videoDetails.author.name, info.videoDetails.thumbnails[4].url);
