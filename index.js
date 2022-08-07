@@ -11,7 +11,7 @@ const figlet = require('figlet');
 const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
 global.client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 global.client.login(env.discord.token);

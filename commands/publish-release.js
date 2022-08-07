@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const env = require('../env.js');
+const { publishRelease } = require('../utilities/publish-release.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -33,31 +33,31 @@ module.exports = {
 		const fourthquestion = new ActionRowBuilder().addComponents(songwhip);
 		motal.addComponents(firstquestion, secondquestion, thirdquestion, fourthquestion);
 		await interaction.showModal(motal);
-		const submission = await interaction.awaitModalSubmit({
-			max: 1,
-			time: 60000,
-			filter: i => i.customId === 'publish-release',
-		});
-		if (!submission) {
-			return interaction.reply('Timed out.');
+		const filter = i => i.customId === 'publish-release' && i.user.id === interaction.user.id;
+		const answer = await interaction.awaitModalSubmit({ filter, time: 60000 });
+		if (answer) {
+			const artistnameanswer = answer.fields.getTextInputValue('artistname');
+			const tracknameanswer = answer.fields.getTextInputValue('trackname');
+			const releasedescriptionanswer = answer.fields.getTextInputValue('releasedescription');
+			const songwhipanswer = answer.fields.getTextInputValue('songwhip');
+			var answers = {
+				artist: artistnameanswer,
+				track: tracknameanswer,
+				description: releasedescriptionanswer,
+				songwhip: songwhipanswer,
+			};
+			answer.reply({
+				embeds: [
+					embedcreator.setembed(
+						{
+							title: 'Answers Submitted',
+							description: 'Please check your DMs for further instructions.',
+							color: 0x19ebfe,
+						},
+					)],
+				ephemeral: true,
+			});
+			await publishRelease(interaction, answers);
 		}
-		if (submission.cancel) {
-			return interaction.reply('Cancelled.');
-		}
-		var artistnameanswer = submission.fields.getTextInputValue('artistname');
-		var tracknameanswer = submission.fields.getTextInputValue('trackname');
-		var releasedescriptionanswer = submission.fields.getTextInputValue('releasedescription');
-		var songwhipanswer = submission.fields.getTextInputValue('songwhip');
-		var embed = await embedcreator.setembed({
-			title: `${artistnameanswer} - ${tracknameanswer}`,
-			description: releasedescriptionanswer,
-			color: 0x19ebfe,
-			fields: [
-				{ name: 'Songwhip', value: songwhipanswer },
-			],
-		});
-		const channel = global.client.channels.cache.get(env.utilities.releases_channel);
-		channel.send({ embeds: [embed] });
-
 	},
 };
