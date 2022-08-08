@@ -36,36 +36,8 @@ async function DMUser(interaction, answers) {
 			const url = attachment.url;
 			file = await fetch(url);
 			releaseimage = new AttachmentBuilder(url, attachment.filename);
-			user.send(
-				{
-					embeds: [ embedcreator.setembed(
-						{
-							title: 'Image submission',
-							description: 'Your image has been submitted',
-							color: 0x19ebfe,
-							image: {
-								url: url,
-							},
-						},
-					)],
-				},
-			);
 			console.log('image sent');
 			// send image to discord
-			guild = await global.client.guilds.fetch(env.discord.guild);
-			channel = await guild.channels.fetch(env.utilities.releases.image_channel);
-			channel.send({ files: [releaseimage] }).then(async (message) => {
-				// get attachment url
-				attachmenturl = await message.attachments.first().url;
-				console.log(attachmenturl);
-				previewRelease(answers, attachmenturl, user);
-				collector.stop();
-			},
-			).catch(error => {
-				console.error(error);
-				embedcreator.sendError(error);
-			},
-			);
 		}
 	},
 	);
