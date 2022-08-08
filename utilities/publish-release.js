@@ -1,13 +1,16 @@
 const env = require('../env.js');
 const fetch = require('node-fetch');
 const embedcreator = require('../embed.js');
-const { AttachmentBuilder } = require('discord.js');
-attachmenturl = null;
-async function publishRelease(interaction, answers) {
-	DMUser(interaction, answers);
-	console.log('publishRelease');
+const { AttachmentBuilder, ButtonStyle, ActionRowBuilder, ButtonBuilder } = require('discord.js');
+url = null;
+answers = null;
+guild = global.client.guilds.cache.get(env.guildid);
+async function publishRelease(interaction, useranswers) {
+	answers = useranswers;
+	await CollectImage(interaction);
+
 }
-async function DMUser(interaction, answers) {
+async function CollectImage(interaction) {
 	// get userid from interaction
 	const userid = interaction.user.id;
 	// get user from client
@@ -32,12 +35,11 @@ async function DMUser(interaction, answers) {
 	collector.on('collect', async (m) => {
 		console.log('message received');
 		if (m.attachments.size > 0) {
-			const attachment = m.attachments.first();
-			const url = attachment.url;
+			const attachment = await m.attachments.first();
+			url = attachment.url;
 			file = await fetch(url);
 			releaseimage = new AttachmentBuilder(url, attachment.filename);
-			console.log('image sent');
-			// send image to discord
+			previewRelease(answers, interaction.user);
 		}
 	},
 	);
@@ -58,7 +60,7 @@ async function DMUser(interaction, answers) {
 	},
 	);
 }
-async function previewRelease(answers, attachmenturl, user) {
+async function previewRelease(answers, user) {
 	console.log('previewRelease');
 	artist = answers.artist;
 	track = answers.track;
@@ -66,6 +68,7 @@ async function previewRelease(answers, attachmenturl, user) {
 	songwhip = answers.songwhip;
 	embed = {
 		title: track,
+		url: songwhip,
 		description: description,
 		fields: [
 			{
@@ -81,19 +84,30 @@ async function previewRelease(answers, attachmenturl, user) {
 		],
 		color: 0x19ebfe,
 		image: {
-			url: attachmenturl,
+			url: url,
 		},
 	};
 
+	const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('submit')
+				.setLabel('Submit')
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
+				.setCustomId('cancel')
+				.setLabel('Cancel')
+				.setStyle(ButtonStyle.Danger),
+		);
 	user.send(
 		{
 			content: 'Embed Preview',
 			embeds: [embedcreator.setembed({
 				title: 'Embed Preview',
-				description: 'This is the embed preview',
+				description: 'Please review the embed before submitting\n press submit to publish your submission\n press cancel to cancel your submission',
 			},
 			),
-			embed],
+			embed], components: [row],
 		},
 	);
 	console.log('preview sent');

@@ -35,7 +35,7 @@ module.exports = {
 			motal.addComponents(firstquestion, secondquestion, thirdquestion, fourthquestion);
 			await interaction.showModal(motal);
 			const filter = i => i.customId === 'publish-release' && i.user.id === interaction.user.id;
-			const answer = await interaction.awaitModalSubmit({ filter, time: 100000 });
+			const answer = await interaction.awaitModalSubmit({ filter, time: 1800000 });
 			if (answer) {
 				const artistnameanswer = answer.fields.getTextInputValue('artistname');
 				const tracknameanswer = answer.fields.getTextInputValue('trackname');
@@ -63,7 +63,7 @@ module.exports = {
 		}
 		catch (error) {
 			console.error(error);
-			interaction.sendError(error);
+			embedcreator.sendError(error);
 		}
 	},
 };
