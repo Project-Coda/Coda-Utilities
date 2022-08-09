@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { publishRelease } = require('../utilities/publish-release.js');
+const { CollectImage } = require('../utilities/publish-release.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -35,7 +35,7 @@ module.exports = {
 			motal.addComponents(firstquestion, secondquestion, thirdquestion, fourthquestion);
 			await interaction.showModal(motal);
 			const filter = i => i.customId === 'publish-release' && i.user.id === interaction.user.id;
-			const answer = await interaction.awaitModalSubmit({ filter, time: 1800000 });
+			const answer = await interaction.awaitModalSubmit({ filter, time: 2700000 });
 			if (answer) {
 				const artistnameanswer = answer.fields.getTextInputValue('artistname');
 				const tracknameanswer = answer.fields.getTextInputValue('trackname');
@@ -58,7 +58,7 @@ module.exports = {
 						)],
 					ephemeral: true,
 				});
-				await publishRelease(interaction, answers);
+				await CollectImage(interaction, answers);
 			}
 		}
 		catch (error) {
