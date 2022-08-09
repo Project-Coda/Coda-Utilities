@@ -9,7 +9,7 @@ module.exports = {
 		.setDescription('Publish a release to the releases channel'),
 	async execute(interaction) {
 		try {
-			const motal = new ModalBuilder()
+			const modal = new ModalBuilder()
 				.setTitle('Publish Release')
 				.setCustomId('publish-release');
 			const artistname = new TextInputBuilder()
@@ -32,8 +32,8 @@ module.exports = {
 			const secondquestion = new ActionRowBuilder().addComponents(trackname);
 			const thirdquestion = new ActionRowBuilder().addComponents(releasedescription);
 			const fourthquestion = new ActionRowBuilder().addComponents(songwhip);
-			motal.addComponents(firstquestion, secondquestion, thirdquestion, fourthquestion);
-			await interaction.showModal(motal);
+			modal.addComponents(firstquestion, secondquestion, thirdquestion, fourthquestion);
+			await interaction.showModal(modal);
 			const filter = i => i.customId === 'publish-release' && i.user.id === interaction.user.id;
 			const answer = await interaction.awaitModalSubmit({ filter, time: 2700000 });
 			if (answer) {
