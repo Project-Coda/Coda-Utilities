@@ -41,24 +41,43 @@ module.exports = {
 				const tracknameanswer = answer.fields.getTextInputValue('trackname');
 				const releasedescriptionanswer = answer.fields.getTextInputValue('releasedescription');
 				const songwhipanswer = answer.fields.getTextInputValue('songwhip');
-				var answers = {
-					artist: artistnameanswer,
-					track: tracknameanswer,
-					description: releasedescriptionanswer,
-					songwhip: songwhipanswer,
-				};
-				await answer.reply({
-					embeds: [
-						embedcreator.setembed(
-							{
-								title: 'Answers Submitted',
-								description: 'Please check your DMs for further instructions.',
-								color: 0x19ebfe,
-							},
-						)],
-					ephemeral: true,
-				});
-				await CollectImage(interaction, answers);
+				if (songwhipanswer.includes('https://songwhip.com/')) {
+					const artist_name = songwhipanswer.split('/')[3];
+					const songwhipartistanswer = 'https://songwhip.com/' + artist_name;
+					const answers = {
+						artist: artistnameanswer,
+						track: tracknameanswer,
+						description: releasedescriptionanswer,
+						songwhip: songwhipanswer,
+						songwhip_artist: songwhipartistanswer,
+					};
+					await answer.reply({
+						embeds: [
+							embedcreator.setembed(
+								{
+									title: 'Answers Submitted',
+									description: 'Please check your DMs for further instructions.',
+									color: 0x19ebfe,
+								},
+							)],
+						ephemeral: true,
+					});
+					await CollectImage(interaction, answers);
+				}
+				else {
+					await answer.reply({
+						embeds: [
+							embedcreator.setembed(
+								{
+									title: 'Error',
+									description: 'Please enter a valid Songwhip URL.',
+									color: 0x19ebfe,
+								},
+							)],
+						ephemeral: true,
+					});
+					embedcreator.sendError(interaction.user.id + ' entered an invalid Songwhip URL.' + '/n Answers \n Artist: ' + artistnameanswer + '\n Track: ' + tracknameanswer + '\n Description: ' + releasedescriptionanswer + '\n Songwhip: ' + songwhipanswer);
+				}
 			}
 		}
 		catch (error) {

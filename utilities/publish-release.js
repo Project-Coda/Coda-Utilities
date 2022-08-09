@@ -7,6 +7,7 @@ url = null;
 answers = null;
 guild = null;
 nickname = null;
+userobject = null;
 async function CollectImage(interaction, answers) {
 	try {
 	// get userid from interaction
@@ -76,10 +77,16 @@ async function previewRelease(answers, user) {
 		track = answers.track;
 		description = answers.description;
 		songwhip = answers.songwhip;
+		songwhip_artist = answers.songwhip_artist;
 		embed = {
 			title: track,
 			url: songwhip,
 			description: description,
+			author: {
+				name: artist,
+				url: songwhip_artist,
+				icon_url: userobject.displayAvatarURL(),
+			},
 			fields: [
 				{
 					name: 'Link',
@@ -120,8 +127,6 @@ async function previewRelease(answers, user) {
 				embed], components: [row],
 			},
 		);
-		console.log(embedpreview);
-		console.log(embedpreview.channel);
 		console.log('preview sent');
 		const collector = await embedpreview.channel.createMessageComponentCollector(
 			{
@@ -213,10 +218,16 @@ async function sendRelease(answers, attachmenturl) {
 		track = answers.track;
 		description = answers.description;
 		songwhip = answers.songwhip;
+		songwhip_artist = answers.songwhip_artist;
 		embed = {
 			title: track,
 			url: songwhip,
 			description: description,
+			author: {
+				name: artist,
+				url: songwhip_artist,
+				icon_url: userobject.displayAvatarURL(),
+			},
 			fields: [
 				{
 					name: 'Link',
