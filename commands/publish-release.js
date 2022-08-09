@@ -47,7 +47,7 @@ module.exports = {
 					description: releasedescriptionanswer,
 					songwhip: songwhipanswer,
 				};
-				answer.reply({
+				await answer.reply({
 					embeds: [
 						embedcreator.setembed(
 							{
