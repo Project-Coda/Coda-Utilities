@@ -2,12 +2,35 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { CollectImage } = require('../utilities/publish-release.js');
+const env = require('../env.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('publish-release')
 		.setDescription('Publish a release to the releases channel'),
 	async execute(interaction) {
+		if (!interaction.member.roles.cache.has(env.utilities.releases.verified_artist_role)) {
+			global.client.channels.cache.get(env.discord.logs_channel).send({
+				embeds: [ embedcreator.setembed(
+					{
+						title: 'Incident Detected',
+						description: `${interaction.member.user} tried to use the publish-release command but did not have the verified artist role.`,
+						color: 0xe74c3c,
+					},
+				)],
+			},
+			);
+			return interaction.reply({
+				embeds: [ embedcreator.setembed(
+					{
+						title: 'Incident Reported',
+						description: 'You do not have permission to use this command. This incident has been reported.',
+						color: 0xe74c3c,
+					},
+				),
+				], ephemeral: true,
+			});
+		}
 		try {
 			const modal = new ModalBuilder()
 				.setTitle('Publish Release')

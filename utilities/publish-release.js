@@ -14,7 +14,7 @@ async function CollectImage(interaction, answers) {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const userid = await interaction.user.id;
 		userobject = await guild.members.fetch(userid);
-		nickname = await userobject.nickname;
+		nickname = await userobject.displayName;
 
 		// get user from client
 		const user = await global.client.users.fetch(userid);
@@ -37,13 +37,12 @@ async function CollectImage(interaction, answers) {
 		);
 
 		collector.on('collect', async (m) => {
-			console.log('message received');
 			if (m.attachments.size > 0) {
 				const attachment = await m.attachments.first();
-				url = attachment.url;
+				url = await attachment.url;
 				file = await fetch(url);
 				releaseimage = new AttachmentBuilder(url, attachment.filename);
-				previewRelease(answers, interaction.user);
+				await previewRelease(answers, interaction.user);
 			}
 		},
 		);
@@ -118,7 +117,6 @@ async function previewRelease(answers, user) {
 			);
 		embedpreview = await user.send(
 			{
-				content: 'Embed Preview',
 				embeds: [embedcreator.setembed({
 					title: 'Embed Preview',
 					description: 'Please review the embed before submitting\n press submit to publish your submission\n press cancel to cancel your submission',
