@@ -64,7 +64,7 @@ module.exports = {
 				const tracknameanswer = answer.fields.getTextInputValue('trackname');
 				const releasedescriptionanswer = answer.fields.getTextInputValue('releasedescription');
 				const songwhipanswer = answer.fields.getTextInputValue('songwhip');
-				if (songwhipanswer.includes('https://songwhip.com/')) {
+				if (songwhipanswer.startsWith('https://songwhip.com/')) {
 					const artist_name = songwhipanswer.split('/')[3];
 					const songwhipartistanswer = 'https://songwhip.com/' + artist_name;
 					const answers = {
