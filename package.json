@@ -24,7 +24,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.0.1",
     "@tonaljs/tonal": "^4.6.5",
-    "discord-api-types": "^0.37.9",
+    "discord-api-types": "^0.37.11",
     "discord.js": "^14.3.0",
     "emoji-unicode": "^2.0.1",
     "figlet": "^1.5.2",
