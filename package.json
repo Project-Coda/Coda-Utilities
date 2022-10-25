@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Project-Coda/Coda-Utilities#readme",
   "devDependencies": {
-    "eslint": "^8.24.0",
+    "eslint": "^8.26.0",
     "nodemon": "^2.0.19"
   },
   "dependencies": {
