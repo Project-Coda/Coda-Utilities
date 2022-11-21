@@ -100,6 +100,7 @@ global.client.on('guildMemberAdd', async member => {
 		}
 	}
 	greet.sendNotify(member);
+	greet.sendWelcome(member);
 	// Update presence
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();

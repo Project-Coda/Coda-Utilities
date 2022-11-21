@@ -109,5 +109,17 @@ async function SendNewBotAlert(member) {
 	);
 }
 
+async function sendWelcome(member) {
+// send welcome message
+	const welcome = await global.client.channels.cache.get(env.discord.welcome_channel);
+	welcome.send(
+		// send message
+		{
+			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + ' <@' + member.user + '>!' + '\n Feel free to grab some roles in <#' + env.discord.role_assign_channel +
+			'> and introduce yourself in <#' + env.discord.self_introduction_channel + '>' +
+			'\n' + 'also feel free to check out Radio Coda, our community radio station at <https://projectcoda.studio/radio> and our <#' + env.discord.just_listening_channel + '> and' + '<#' + env.discord.vibing_to_coda_channel + '> channels',
+		},
+	);
+}
 
-module.exports = { sendNotify, getUsers, sendKickAlert, SendNewBotAlert };
+module.exports = { sendNotify, getUsers, sendKickAlert, SendNewBotAlert, sendWelcome };
