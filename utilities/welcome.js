@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 async function getList() {
 	file = await fetch(env.utilities.welcomemessagesfile);
 	messages = await file.text();
-	messages = messages.split('\n');
+	messages = messages.split('end');
 	return messages;
 }
 

@@ -1,6 +1,7 @@
 const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
+const welcome = require('./welcome.js');
 // get users from database and put id's in array
 async function getUsers() {
 	db = await mariadb.getConnection();
@@ -111,13 +112,12 @@ async function SendNewBotAlert(member) {
 
 async function sendWelcome(member) {
 // send welcome message
-	const welcome = await global.client.channels.cache.get(env.discord.welcome_channel);
-	welcome.send(
+	const welcome_channel = await global.client.channels.cache.get(env.discord.welcome_channel);
+	const welcome_message = await welcome.getWelcome();
+	welcome_channel.send(
 		// send message
 		{
-			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + ' <@' + member.user + '>!' + '\n Feel free to grab some roles in <#' + env.discord.role_assign_channel +
-			'> and introduce yourself in <#' + env.discord.self_introduction_channel + '>' +
-			'\n' + 'also feel free to check out Radio Coda, our community radio station at <https://projectcoda.studio/radio> and our <#' + env.discord.just_listening_channel + '> and' + '<#' + env.discord.vibing_to_coda_channel + '> channels',
+			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + ' ' + member.user + '!\n' + welcome_message,
 		},
 	);
 }
