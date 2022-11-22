@@ -1,6 +1,7 @@
 const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
+const welcome = require('./welcome.js');
 // get users from database and put id's in array
 async function getUsers() {
 	db = await mariadb.getConnection();
@@ -109,5 +110,16 @@ async function SendNewBotAlert(member) {
 	);
 }
 
+async function sendWelcome(member) {
+// send welcome message
+	const welcome_channel = await global.client.channels.cache.get(env.discord.welcome_channel);
+	const welcome_message = await welcome.getWelcome();
+	welcome_channel.send(
+		// send message
+		{
+			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + `${member.user}` + '!\n' + await welcome_message,
+		},
+	);
+}
 
-module.exports = { sendNotify, getUsers, sendKickAlert, SendNewBotAlert };
+module.exports = { sendNotify, getUsers, sendKickAlert, SendNewBotAlert, sendWelcome };
