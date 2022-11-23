@@ -117,7 +117,7 @@ async function sendWelcome(member) {
 	welcome_channel.send(
 		// send message
 		{
-			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + `${member.user}` + '!\n' + await welcome_message,
+			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + ` ${member.user}` + '!\n' + await welcome_message,
 		},
 	);
 }
