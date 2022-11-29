@@ -103,10 +103,14 @@ module.exports = {
 						], ephemeral: true,
 					});
 				}
-				embedcreator.log({
-					title: 'VC Mute',
-					description: `${interaction.member.user} muted ${people} in ${vc}`,
-					color: 0xe74c3c,
+				global.client.channels.cache.get(env.discord.logs_channel).send({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'VC Mute',
+							description: `${interaction.member.user} muted ${people} in ${vc}`,
+							color: 0xe74c3c,
+						},
+					)],
 				});
 				return interaction.reply({
 					embeds: [ embedcreator.setembed(
@@ -150,10 +154,14 @@ module.exports = {
 						], ephemeral: true,
 					});
 				}
-				embedcreator.log({
-					title: 'VC Mute',
-					description: `${interaction.member.user} unmuted ${people} in ${vc}`,
-					color: 0x2ecc71,
+				global.client.channels.cache.get(env.discord.logs_channel).send({
+					embeds: [ embedcreator.setembed(
+						{
+							title: 'VC Mute',
+							description: `${interaction.member.user} unmuted ${people} in ${vc}`,
+							color: 0xe74c3c,
+						},
+					)],
 				});
 				return interaction.reply({
 					embeds: [ embedcreator.setembed(
