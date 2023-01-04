@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { createCompletion } = require('../utilities/openai.js');
+const { codeBlock, inlineCode } = require('discord.js');
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,9 +22,16 @@ module.exports = {
 				{
 					embeds: [ embedcreator.setembed(
 						{
-							title: prompt,
-							description: response,
+							title: 'Response to ' + inlineCode(prompt) + '',
+							author: {
+								name: 'OpenAI',
+								url: 'https://openai.com/',
+							},
+							description: codeBlock(response),
 							color: 0x2ecc71,
+							footer : {
+								text: 'Ask Coda, Powered by OpenAI',
+							},
 						},
 					)],
 				},
