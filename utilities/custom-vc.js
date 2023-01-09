@@ -24,6 +24,10 @@ async function Create(newState) {
 				id: member.id,
 				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
 			},
+			{
+				id: newState.guild.roles.everyone,
+				allow: [PermissionFlagsBits.ViewChannel],
+			},
 		],
 	});
 
