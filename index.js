@@ -212,7 +212,6 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 				console.error(error);
 			}
 		}
-
 		console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
 		embedcreator.log(`${user} un-reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
@@ -246,8 +245,6 @@ global.client.on('interactionCreate', async interaction => {
 		if (usercheck === false) return;
 		if (!usercheck.includes(channel)) return;
 		await CustomVC.buttonResponder(interaction);
-
-
 	}
 	catch (error) {
 		console.error(error);
