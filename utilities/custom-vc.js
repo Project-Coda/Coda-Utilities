@@ -2,10 +2,16 @@ const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, Butto
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
+collector = false;
 async function buttonResponder(interaction) {
 	const buttonid = interaction.customId;
 	const userchannel = await checkUser(interaction.user.id);
 	const userid = interaction.user.id;
+	// check if collector is running
+	if (collector) {
+		await interaction.reply({ content: 'Please finish the previous action first', ephemeral: true });
+		return;
+	}
 	if (buttonid === 'deletechannel') {
 		interaction.reply({ content: 'Channel deleted' });
 		await deleteChannel(userchannel);
@@ -14,12 +20,15 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please enter the new name' });
 		// message collector to collect new name
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
-			const newname = String(m.content);
+			const newname = await m.content;
+			await collector.stop();
+			collector = false;
 			await renameChannel(userchannel, newname);
-			interaction.followUp({ content: 'Channel renamed to ' + newname });
-			collector.stop();
+			await interaction.followUp({ content: 'Channel renamed to ' + newname });
+			const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
+			interaction.followUp({ content: content, embeds: [embed], components: [row] });
 		});
 		collector.on('end', collected => {
 			if (collected.size === 0) {
@@ -31,17 +40,20 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please enter the new user limit' });
 		// message collector to collect new user limit
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newlimit = await m.content;
+			await collector.stop();
+			collector = false;
 			if (parseInt(newlimit) >= 0 && parseInt(newlimit) <= 99) {
 				await changeUserLimit(userchannel, newlimit);
-				interaction.followUp({ content: 'User limit changed to ' + newlimit });
+				await interaction.followUp({ content: 'User limit changed to ' + newlimit });
+				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
+				interaction.followUp({ content: content, embeds: [embed], components: [row] });
 			}
 			else {
 				interaction.followUp({ content: 'Invalid user limit' });
 			}
-			collector.stop();
 		});
 		collector.on('end', collected => {
 			if (collected.size === 0) {
@@ -53,18 +65,20 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please mention the new owner' });
 		// message collector to collect new owner
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
-			const newowner = m.mentions.members.first();
-			console.log(newowner.user.id);
+			const newowner = await m.mentions.members.first();
+			await collector.stop();
+			collector = false;
 			if (newowner) {
 				await transferOwnership(userid, newowner.user.id, userchannel);
-				interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
+				await interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
+				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
+				interaction.followUp({ content: content, embeds: [embed], components: [row] });
 			}
 			else {
 				interaction.followUp({ content: 'Invalid user' });
 			}
-			collector.stop();
 		});
 		collector.on('end', collected => {
 			if (collected.size === 0) {
@@ -74,14 +88,16 @@ async function buttonResponder(interaction) {
 	}
 	if (buttonid === 'visibility') {
 		const status = await changeVisibility(userchannel);
-		interaction.reply({ content: 'Visibility changed to ' + status });
+		await interaction.reply({ content: 'Visibility changed to ' + status });
+		const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
+		interaction.followUp({ content: content, embeds: [embed], components: [row] });
 	}
 }
 // Rename Channel
 async function renameChannel(channelid, newname) {
 	try {
-		const channel = global.client.channels.cache.get(channelid);
-		channel.setName(newname);
+		const channel = await global.client.channels.cache.get(channelid);
+		return await channel.setName(newname);
 	}
 	catch (error) {
 		console.error(error);
@@ -112,8 +128,8 @@ async function changeVisibility(channelid) {
 // Change User Limit
 async function changeUserLimit(channelid, newlimit) {
 	try {
-		const channel = global.client.channels.cache.get(channelid);
-		channel.setUserLimit(newlimit);
+		const channel = await global.client.channels.cache.get(channelid);
+		return await channel.setUserLimit(newlimit);
 	}
 	catch (error) {
 		console.error(error);
@@ -244,8 +260,8 @@ async function Create(newState) {
 	}
 	try {
 		// send menu embed
-		const { embed, row } = await generateMenuEmbed();
-		await channel.send({ embeds: [embed], components: [row] });
+		const { content, embed, row } = await generateMenuEmbed(channel.id);
+		await channel.send({ content: content, embeds: [embed], components: [row] });
 	}
 	catch (error) {
 		console.error(error);
@@ -253,11 +269,36 @@ async function Create(newState) {
 	}
 }
 // Generate Menu Embed
-async function generateMenuEmbed() {
+async function generateMenuEmbed(channelid) {
+	// get owner
+	const db = await mariadb.getConnection();
+	const rows = await db.query('SELECT user_id FROM custom_vc WHERE channel_id = ?', [channelid]);
+	db.end();
+	const owner = rows[0].user_id;
+	const content = 'Welcome <@' + owner + '> to your custom voice channel.';
+	const channel = await global.client.channels.cache.get(channelid);
+	const guild = await global.client.guilds.cache.get(env.discord.guild);
+	// check if channel is visible
+	const visible = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
+	if (visible) {
+		visibilitystatus = 'Visible';
+		visibilitybutton = ButtonStyle.Success;
+	}
+	else {
+		visibilitystatus = 'Hidden';
+		visibilitybutton = ButtonStyle.Danger;
+	}
 	const embed = await embedcreator.setembed(
 		{
 			title: 'Custom voice channel menu',
-			description: 'Click on the buttons below, to change the settings of your custom voice channel.',
+			description: `
+			Visibility: ${visibilitystatus}
+			Owner: <@${owner}>
+			Channel name: ${channel.name}
+			Bitrate: ${channel.bitrate}
+			User limit: ${channel.userLimit}
+			Click on the buttons below to manage your channel.
+			`,
 		},
 	);
 	const userlimit = new ButtonBuilder()
@@ -266,8 +307,8 @@ async function generateMenuEmbed() {
 		.setStyle(ButtonStyle.Primary);
 	const visibility = new ButtonBuilder()
 		.setCustomId('visibility')
-		.setLabel('Visibility')
-		.setStyle(ButtonStyle.Success);
+		.setLabel(visibilitystatus)
+		.setStyle(visibilitybutton);
 	const transferownership = new ButtonBuilder()
 		.setCustomId('transferownership')
 		.setLabel('Transfer ownership')
@@ -282,7 +323,7 @@ async function generateMenuEmbed() {
 		.setStyle(ButtonStyle.Primary);
 	const row = new ActionRowBuilder()
 		.addComponents(renamechannel, userlimit, visibility, transferownership, deletechannel);
-	return { embed, row };
+	return { content, embed, row };
 }
 // Destroy CustomVC
 async function Cleanup() {
