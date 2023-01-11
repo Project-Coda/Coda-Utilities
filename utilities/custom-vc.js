@@ -2,6 +2,18 @@ const { ChannelType, PermissionFlagsBits } = require('discord.js');
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
+// Check if user already has a channel
+async function checkUser(userid) {
+	const db = await mariadb.getConnection();
+	const rows = await db.query('SELECT channel_id FROM custom_vc WHERE user_id = ?', [userid]);
+	db.end();
+	if (rows.length > 0) {
+		return rows[0].channel_id;
+	}
+	else {
+		return false;
+	}
+}
 // Get Channels from DB
 async function getChannels() {
 	db = await mariadb.getConnection();
@@ -37,16 +49,18 @@ async function deleteChannel(channel_id) {
 }
 // Create CustomVC
 async function Create(newState) {
-	console.log(newState);
 	// check to ensure user doesn't already have a channel
-
 	// get member from newState
 	const member = newState.member;
+	const userid = await member.id;
+	const userhaschannel = await checkUser(newState.member.id);
+	if (userhaschannel) {
+		return member.voice.setChannel(userhaschannel);
+	}
 	// create channel
 	// get category
 	const category = newState.guild.channels.cache.get(newState.channelId).parentId;
 	guild = await global.client.guilds.cache.get(env.discord.guild);
-	const userid = await member.id;
 	userobject = await guild.members.fetch(userid);
 	nickname = await userobject.displayName;
 	const channel = await member.guild.channels.create({
@@ -85,23 +99,19 @@ async function Cleanup() {
 	try {
 		// grab channe id's from db
 		const channels = await getChannels();
-		console.log(channels);
 		// loop through channels
 		for (const channel_id of channels) {
 			// check if channel exists
 			const channel = await global.client.channels.cache.get(channel_id);
 			if (channel) {
-				console.log(channel.members.size);
 				// check if channel is empty
 				if (channel.members.size == 0) {
 				// delete channel
-					console.log('Deleting channel: ' + channel.id);
 					await deleteChannel(channel.id);
 				}
 			}
 			else {
 				// delete channel from db
-				console.log('Deleting channel: ' + channel_id);
 				await deleteChannel(channel_id);
 			}
 		}
