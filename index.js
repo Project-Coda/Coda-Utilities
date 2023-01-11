@@ -12,7 +12,7 @@ const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
 const CustomVC = require('./utilities/custom-vc.js');
 global.client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 global.client.login(env.discord.token);
@@ -233,6 +233,28 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		CustomVC.Create(newState);
 	}
 });
+
+// listen for button interactions
+global.client.on('interactionCreate', async interaction => {
+	try {
+		if (!interaction.isButton()) return;
+		// check if channel is in db
+		const channel = interaction.channel.id;
+		const custom_vc_channels = await CustomVC.getChannels();
+		if (!custom_vc_channels.includes(channel)) return;
+		usercheck = await CustomVC.checkUser(interaction.user.id);
+		if (usercheck === false) return;
+		if (!usercheck.includes(channel)) return;
+		await CustomVC.buttonResponder(interaction);
+
+
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
 
 process.on('unhandledRejection', error => {
 	console.error(error);

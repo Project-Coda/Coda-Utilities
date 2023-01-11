@@ -2,6 +2,125 @@ const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, Butto
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
+async function buttonResponder(interaction) {
+	const buttonid = interaction.customId;
+	const userchannel = await checkUser(interaction.user.id);
+	const userid = interaction.user.id;
+	if (buttonid === 'deletechannel') {
+		interaction.reply({ content: 'Channel deleted' });
+		await deleteChannel(userchannel);
+	}
+	if (buttonid === 'renamechannel') {
+		interaction.reply({ content: 'Please enter the new name' });
+		// message collector to collect new name
+		const filter = m => m.author.id === interaction.user.id;
+		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		collector.on('collect', async m => {
+			const newname = String(m.content);
+			await renameChannel(userchannel, newname);
+			interaction.followUp({ content: 'Channel renamed to ' + newname });
+			collector.stop();
+		});
+	}
+	if (buttonid === 'userlimit') {
+		interaction.reply({ content: 'Please enter the new user limit' });
+		// message collector to collect new user limit
+		const filter = m => m.author.id === interaction.user.id;
+		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		collector.on('collect', async m => {
+			const newlimit = await m.content;
+			if (parseInt(newlimit) >= 0 && parseInt(newlimit) <= 99) {
+				await changeUserLimit(userchannel, newlimit);
+				interaction.followUp({ content: 'User limit changed to ' + newlimit });
+			}
+			else {
+				interaction.followUp({ content: 'Invalid user limit' });
+			}
+			collector.stop();
+		});
+	}
+	if (buttonid === 'transferownership') {
+		interaction.reply({ content: 'Please mention the new owner' });
+		// message collector to collect new owner
+		const filter = m => m.author.id === interaction.user.id;
+		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		collector.on('collect', async m => {
+			const newowner = m.mentions.members.first();
+			console.log(newowner.user.id);
+			if (newowner) {
+				await transferOwnership(userid, newowner.user.id, userchannel);
+				interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
+			}
+			else {
+				interaction.followUp({ content: 'Invalid user' });
+			}
+			collector.stop();
+		});
+	}
+	if (buttonid === 'visibility') {
+		const status = await changeVisibility(userchannel);
+		interaction.reply({ content: 'Visibility changed to ' + status });
+	}
+}
+// Rename Channel
+async function renameChannel(channelid, newname) {
+	try {
+		const channel = global.client.channels.cache.get(channelid);
+		channel.setName(newname);
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+// Change Visibility
+async function changeVisibility(channelid) {
+	try {
+		const channel = global.client.channels.cache.get(channelid);
+		if (channel.permissionsFor()) {
+			channel.permissionOverwrites.edit(env.guildid
+		}
+		else {
+// Change User Limit
+async function changeUserLimit(channelid, newlimit) {
+	try {
+		const channel = global.client.channels.cache.get(channelid);
+		channel.setUserLimit(newlimit);
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+// Transfer Ownership
+async function transferOwnership(olduser, newuser, channelid) {
+	try {
+	// set vc perms
+		const channel = global.client.channels.cache.get(channelid);
+		// set perms
+		channel.permissionOverwrites.delete(olduser);
+		channel.permissionOverwrites.set([
+			{
+				id: newuser,
+				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
+			},
+		],
+		);
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+	try {
+		const db = await mariadb.getConnection();
+		await db.query('UPDATE custom_vc SET user_id = ? WHERE channel_id = ?', [newuser, channelid]);
+		db.end();
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
 // Check if user already has a channel
 async function checkUser(userid) {
 	const db = await mariadb.getConnection();
@@ -128,8 +247,12 @@ async function generateMenuEmbed() {
 		.setCustomId('deletechannel')
 		.setLabel('Delete channel')
 		.setStyle(ButtonStyle.Danger);
+	const renamechannel = new ButtonBuilder()
+		.setCustomId('renamechannel')
+		.setLabel('Rename channel')
+		.setStyle(ButtonStyle.Primary);
 	const row = new ActionRowBuilder()
-		.addComponents(userlimit, visibility, transferownership, deletechannel);
+		.addComponents(renamechannel, userlimit, visibility, transferownership, deletechannel);
 	return { embed, row };
 }
 // Destroy CustomVC
@@ -161,4 +284,4 @@ async function Cleanup() {
 }
 
 
-module.exports = { Create, Cleanup };
+module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder };
