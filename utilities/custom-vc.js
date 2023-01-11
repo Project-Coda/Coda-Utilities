@@ -2,8 +2,44 @@ const { ChannelType, PermissionFlagsBits } = require('discord.js');
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
+// Get Channels from DB
+async function getChannels() {
+	db = await mariadb.getConnection();
+	rows = await db.query('SELECT channel_id FROM custom_vc');
+	channels = [];
+	for (row of rows) {
+		channels.push(row.channel_id);
+	}
+	db.end();
+	return channels;
+}
+// Delete Channel
+async function deleteChannel(channel_id) {
+	try {
+		const db = await mariadb.getConnection();
+		await db.query('DELETE FROM custom_vc WHERE channel_id = ?', [channel_id]);
+		db.end();
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+	try {
+		if (global.client.channels.cache.get(channel_id)){
+			await global.client.channels.cache.get(channel_id).delete();
+		}
+
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+// Create CustomVC
 async function Create(newState) {
 	console.log(newState);
+	// check to ensure user doesn't already have a channel
+
 	// get member from newState
 	const member = newState.member;
 	// create channel
@@ -45,26 +81,31 @@ async function Create(newState) {
 	}
 }
 // Destroy CustomVC
-async function Destroy(oldState) {
-	// get member from oldState
-	const member = oldState.member;
-	// check if member has a custom vc
+async function Cleanup() {
 	try {
-		const db = await mariadb.getConnection();
-		const channel = await db.query('SELECT * FROM custom_vc WHERE user_id = ?', [member.id]);
-		db.end();
-		if (channel.length === 0) return;
-		// delete channel
-		const channelid = channel[0].channel_id;
-		const guild = member.guild;
-		const channelToDelete = guild.channels.cache.get(channelid);
-		// check if channel is empty
-		if (channelToDelete.members.size > 0) return;
-		channelToDelete.delete();
-		// delete channel from db
-		const db2 = await mariadb.getConnection();
-		await db2.query('DELETE FROM custom_vc WHERE user_id = ?', [member.id]);
-		db2.end();
+		// grab channe id's from db
+		const channels = await getChannels();
+		console.log(channels);
+		// loop through channels
+		for (const channel_id of channels) {
+			// check if channel exists
+			const channel = await global.client.channels.cache.get(channel_id);
+			if (channel) {
+				console.log(channel.members.size);
+				// check if channel is empty
+				if (channel.members.size == 0) {
+				// delete channel
+					console.log('Deleting channel: ' + channel.id);
+					await deleteChannel(channel.id);
+				}
+			}
+			else {
+				// delete channel from db
+				console.log('Deleting channel: ' + channel_id);
+				await deleteChannel(channel_id);
+			}
+		}
+
 	}
 	catch (error) {
 		console.error(error);
@@ -72,4 +113,5 @@ async function Destroy(oldState) {
 	}
 }
 
-module.exports = { Create, Destroy };
+
+module.exports = { Create, Cleanup };

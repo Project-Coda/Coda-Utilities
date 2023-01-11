@@ -228,11 +228,9 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 	newUserChannel = await newState.channelId;
 	oldUserChannel = await oldState.channelId;
 	const createcustomvc = env.utilities.customvc_channel;
+	await CustomVC.Cleanup(oldState);
 	if (newUserChannel === createcustomvc) {
 		CustomVC.Create(newState);
-	}
-	else {
-		CustomVC.Destroy(oldState);
 	}
 });
 
