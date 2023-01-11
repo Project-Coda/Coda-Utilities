@@ -1,4 +1,4 @@
-const { ChannelType, PermissionFlagsBits } = require('discord.js');
+const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
@@ -83,6 +83,7 @@ async function Create(newState) {
 
 	// move member to channel
 	member.voice.setChannel(channel);
+
 	// add channel to db
 	try {
 		const db = await mariadb.getConnection();
@@ -93,6 +94,43 @@ async function Create(newState) {
 		console.error(error);
 		embedcreator.sendError(error);
 	}
+	try {
+		// send menu embed
+		const { embed, row } = await generateMenuEmbed();
+		await channel.send({ embeds: [embed], components: [row] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+// Generate Menu Embed
+async function generateMenuEmbed() {
+	const embed = await embedcreator.setembed(
+		{
+			title: 'Custom voice channel menu',
+			description: 'Click on the buttons below, to change the settings of your custom voice channel.',
+		},
+	);
+	const userlimit = new ButtonBuilder()
+		.setCustomId('userlimit')
+		.setLabel('User limit')
+		.setStyle(ButtonStyle.Primary);
+	const visibility = new ButtonBuilder()
+		.setCustomId('visibility')
+		.setLabel('Visibility')
+		.setStyle(ButtonStyle.Success);
+	const transferownership = new ButtonBuilder()
+		.setCustomId('transferownership')
+		.setLabel('Transfer ownership')
+		.setStyle(ButtonStyle.Primary);
+	const deletechannel = new ButtonBuilder()
+		.setCustomId('deletechannel')
+		.setLabel('Delete channel')
+		.setStyle(ButtonStyle.Danger);
+	const row = new ActionRowBuilder()
+		.addComponents(userlimit, visibility, transferownership, deletechannel);
+	return { embed, row };
 }
 // Destroy CustomVC
 async function Cleanup() {
@@ -115,7 +153,6 @@ async function Cleanup() {
 				await deleteChannel(channel_id);
 			}
 		}
-
 	}
 	catch (error) {
 		console.error(error);
