@@ -14,19 +14,24 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please enter the new name' });
 		// message collector to collect new name
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newname = String(m.content);
 			await renameChannel(userchannel, newname);
 			interaction.followUp({ content: 'Channel renamed to ' + newname });
 			collector.stop();
 		});
+		collector.on('end', collected => {
+			if (collected.size === 0) {
+				interaction.followUp({ content: 'Timed out' });
+			}
+		});
 	}
 	if (buttonid === 'userlimit') {
 		interaction.reply({ content: 'Please enter the new user limit' });
 		// message collector to collect new user limit
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newlimit = await m.content;
 			if (parseInt(newlimit) >= 0 && parseInt(newlimit) <= 99) {
@@ -38,12 +43,17 @@ async function buttonResponder(interaction) {
 			}
 			collector.stop();
 		});
+		collector.on('end', collected => {
+			if (collected.size === 0) {
+				interaction.followUp({ content: 'Timed out' });
+			}
+		});
 	}
 	if (buttonid === 'transferownership') {
 		interaction.reply({ content: 'Please mention the new owner' });
 		// message collector to collect new owner
 		const filter = m => m.author.id === interaction.user.id;
-		const collector = interaction.channel.createMessageCollector({ filter, time: 15000 });
+		const collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newowner = m.mentions.members.first();
 			console.log(newowner.user.id);
@@ -55,6 +65,11 @@ async function buttonResponder(interaction) {
 				interaction.followUp({ content: 'Invalid user' });
 			}
 			collector.stop();
+		});
+		collector.on('end', collected => {
+			if (collected.size === 0) {
+				interaction.followUp({ content: 'Timed out' });
+			}
 		});
 	}
 	if (buttonid === 'visibility') {
@@ -76,11 +91,24 @@ async function renameChannel(channelid, newname) {
 // Change Visibility
 async function changeVisibility(channelid) {
 	try {
+		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = global.client.channels.cache.get(channelid);
-		if (channel.permissionsFor()) {
-			channel.permissionOverwrites.edit(env.guildid
+		if (channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel)) {
+			channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false });
+			return 'hidden';
 		}
 		else {
+			channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true });
+			// change button to visible
+			return 'visible';
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+
 // Change User Limit
 async function changeUserLimit(channelid, newlimit) {
 	try {
