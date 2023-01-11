@@ -210,10 +210,11 @@ async function Create(newState) {
 	guild = await global.client.guilds.cache.get(env.discord.guild);
 	userobject = await guild.members.fetch(userid);
 	nickname = await userobject.displayName;
+	vc_bitrate = env.utilities.customvc.bitrate;
 	const channel = await member.guild.channels.create({
 		name: nickname + '\'s Channel',
 		type: ChannelType.GuildVoice,
-		bitrate: 96000,
+		bitrate: vc_bitrate,
 		parent: category,
 		// allow user to manage channel
 		permissionOverwrites: [
