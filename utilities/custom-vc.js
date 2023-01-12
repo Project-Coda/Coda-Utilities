@@ -76,7 +76,7 @@ async function buttonResponder(interaction) {
 					await message.delete();
 				}, 5000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-				interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 				// cleanup old embed
 				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 				await oldembed.delete();
@@ -128,13 +128,13 @@ async function buttonResponder(interaction) {
 					await message.delete();
 				}, 5000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-				interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 				// cleanup old embed
 				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 				await oldembed.delete();
 			}
 			else {
-				followup = interaction.followUp({ content: 'Invalid user' });
+				followup = await interaction.followUp({ content: 'Invalid user' });
 				// delete followUp after timout
 				setTimeout(async function() {
 					await followup.delete();
