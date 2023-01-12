@@ -292,11 +292,11 @@ async function generateMenuEmbed(channelid) {
 		{
 			title: 'Custom voice channel menu',
 			description: `
-			Visibility: ${visibilitystatus}
-			Owner: <@${owner}>
-			Channel name: ${channel.name}
-			Bitrate: ${channel.bitrate}
-			User limit: ${channel.userLimit}
+			**Visibility:** ${visibilitystatus}
+			**Owner:** <@${owner}>
+			**Channel name:** ${channel.name}
+			**Bitrate:** ${channel.bitrate}
+			**User limit:** ${channel.userLimit}
 			Click on the buttons below to manage your channel.
 			`,
 		},
@@ -304,22 +304,27 @@ async function generateMenuEmbed(channelid) {
 	const userlimit = new ButtonBuilder()
 		.setCustomId('userlimit')
 		.setLabel('User limit')
+		.setEmoji('👥')
 		.setStyle(ButtonStyle.Primary);
 	const visibility = new ButtonBuilder()
 		.setCustomId('visibility')
 		.setLabel(visibilitystatus)
+		.setEmoji('👁️')
 		.setStyle(visibilitybutton);
 	const transferownership = new ButtonBuilder()
 		.setCustomId('transferownership')
 		.setLabel('Transfer ownership')
+		.setEmoji('👑')
 		.setStyle(ButtonStyle.Primary);
 	const deletechannel = new ButtonBuilder()
 		.setCustomId('deletechannel')
 		.setLabel('Delete channel')
+		.setEmoji('🗑️')
 		.setStyle(ButtonStyle.Danger);
 	const renamechannel = new ButtonBuilder()
 		.setCustomId('renamechannel')
 		.setLabel('Rename channel')
+		.setEmoji('📝')
 		.setStyle(ButtonStyle.Primary);
 	const row = new ActionRowBuilder()
 		.addComponents(renamechannel, userlimit, visibility, transferownership, deletechannel);
