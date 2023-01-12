@@ -10,8 +10,9 @@ const emojiUnicode = require('emoji-unicode');
 const figlet = require('figlet');
 const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
+const CustomVC = require('./utilities/custom-vc.js');
 global.client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 global.client.login(env.discord.token);
@@ -43,6 +44,8 @@ global.client.once('ready', async () => {
 	await db.query('CREATE TABLE IF NOT EXISTS notify (user_id VARCHAR(255) PRIMARY KEY, name VARCHAR(255))');
 	// create settings table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS settings (setting VARCHAR(255) PRIMARY KEY, value BOOLEAN)');
+	// create custom vc table if it doesn't exist
+	await db.query('CREATE TABLE IF NOT EXISTS custom_vc (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255))');
 	db.end();
 }
 )();
@@ -209,7 +212,6 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 				console.error(error);
 			}
 		}
-
 		console.log(`${user.username} un-reacted to ${roleName} in ${guild.name} with ${emoji}`);
 		embedcreator.log(`${user} un-reacted to ${roleName} in ${guild.name} with ${reaction.emoji}`);
 	}
@@ -220,6 +222,37 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 	}
 },
 );
+
+global.client.on('voiceStateUpdate', async (oldState, newState) => {
+	newUserChannel = await newState.channelId;
+	oldUserChannel = await oldState.channelId;
+	const createcustomvc = env.utilities.customvc.channel;
+	await CustomVC.Cleanup(oldState);
+	if (newUserChannel === createcustomvc) {
+		CustomVC.Create(newState);
+	}
+});
+
+// listen for button interactions
+global.client.on('interactionCreate', async interaction => {
+	try {
+		if (!interaction.isButton()) return;
+		// check if channel is in db
+		const channel = interaction.channel.id;
+		const custom_vc_channels = await CustomVC.getChannels();
+		if (!custom_vc_channels.includes(channel)) return;
+		usercheck = await CustomVC.checkUser(interaction.user.id);
+		if (usercheck === false) return;
+		if (!usercheck.includes(channel)) return;
+		await CustomVC.buttonResponder(interaction);
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
+
 process.on('unhandledRejection', error => {
 	console.error(error);
 	// send error to discord
