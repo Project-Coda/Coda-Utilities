@@ -23,16 +23,34 @@ async function buttonResponder(interaction) {
 		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newname = await m.content;
+			const message = await m;
 			await collector.stop();
 			collector = false;
 			await renameChannel(userchannel, newname);
-			await interaction.followUp({ content: 'Channel renamed to ' + newname });
+			followup = await interaction.followUp({ content: 'Channel renamed to ' + newname });
+			// delete reply after timout
+			setTimeout(async function() {
+				await followup.delete();
+				const reply = await interaction.fetchReply();
+				await reply.delete();
+				// delete user message
+				await message.delete();
+			}, 5000);
 			const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-			interaction.followUp({ content: content, embeds: [embed], components: [row] });
+			await interaction.followUp({ content: content, embeds: [embed], components: [row] });
+			// cleanup old embed
+			const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+			await oldembed.delete();
 		});
-		collector.on('end', collected => {
+		collector.on('end', async collected => {
 			if (collected.size === 0) {
-				interaction.followUp({ content: 'Timed out' });
+				timeout = await interaction.followUp({ content: 'Timed out' });
+				// cleanup timeout message
+				setTimeout(async function() {
+					await timeout.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+				}, 5000);
 			}
 		});
 	}
@@ -43,21 +61,48 @@ async function buttonResponder(interaction) {
 		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newlimit = await m.content;
+			const message = await m;
 			await collector.stop();
 			collector = false;
 			if (parseInt(newlimit) >= 0 && parseInt(newlimit) <= 99) {
 				await changeUserLimit(userchannel, newlimit);
-				await interaction.followUp({ content: 'User limit changed to ' + newlimit });
+				followup = await interaction.followUp({ content: 'User limit changed to ' + newlimit });
+				// delete reply after timout
+				setTimeout(async function() {
+					await followup.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+					// delete user message
+					await message.delete();
+				}, 5000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 				interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				// cleanup old embed
+				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+				await oldembed.delete();
 			}
 			else {
-				interaction.followUp({ content: 'Invalid user limit' });
+				followup = await interaction.followUp({ content: 'Invalid user limit' });
+				// delete followUp after timout
+				setTimeout(async function() {
+					await followup.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+					// delete user message
+					await message.delete();
+				}
+				, 5000);
 			}
 		});
-		collector.on('end', collected => {
+		collector.on('end', async collected => {
 			if (collected.size === 0) {
-				interaction.followUp({ content: 'Timed out' });
+				timeout = await interaction.followUp({ content: 'Timed out' });
+				// cleanup timeout message
+				setTimeout(async function() {
+					await timeout.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+				}, 5000);
 			}
 		});
 	}
@@ -68,29 +113,55 @@ async function buttonResponder(interaction) {
 		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newowner = await m.mentions.members.first();
+			const message = await m;
 			await collector.stop();
 			collector = false;
 			if (newowner) {
 				await transferOwnership(userid, newowner.user.id, userchannel);
-				await interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
+				followup = await interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
+				// delete reply after timout
+				setTimeout(async function() {
+					await followup.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+					// delete user message
+					await message.delete();
+				}, 5000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 				interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				// cleanup old embed
+				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+				await oldembed.delete();
 			}
 			else {
 				interaction.followUp({ content: 'Invalid user' });
 			}
 		});
-		collector.on('end', collected => {
+		collector.on('end', async collected => {
 			if (collected.size === 0) {
-				interaction.followUp({ content: 'Timed out' });
+				timeout = await interaction.followUp({ content: 'Timed out' });
+				// cleanup timeout message
+				setTimeout(async function() {
+					await timeout.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+				}, 5000);
 			}
 		});
 	}
 	if (buttonid === 'visibility') {
 		const status = await changeVisibility(userchannel);
 		await interaction.reply({ content: 'Visibility changed to ' + status });
+		// delete reply after timout
+		setTimeout(async function() {
+			const reply = await interaction.fetchReply();
+			await reply.delete();
+		}, 5000);
 		const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 		interaction.followUp({ content: content, embeds: [embed], components: [row] });
+		// cleanup old embed
+		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+		await oldembed.delete();
 	}
 }
 // Rename Channel
