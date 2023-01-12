@@ -144,7 +144,6 @@ async function buttonResponder(interaction) {
 					await message.delete();
 				}
 				, 5000);
-
 			}
 		});
 		collector.on('end', async collected => {
