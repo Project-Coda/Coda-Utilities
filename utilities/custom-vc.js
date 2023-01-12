@@ -326,7 +326,7 @@ async function Create(newState) {
 	});
 
 	// move member to channel
-	member.voice.setChannel(channel);
+	await member.voice.setChannel(channel);
 
 	// add channel to db
 	try {
