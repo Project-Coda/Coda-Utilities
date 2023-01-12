@@ -134,7 +134,17 @@ async function buttonResponder(interaction) {
 				await oldembed.delete();
 			}
 			else {
-				interaction.followUp({ content: 'Invalid user' });
+				followup = interaction.followUp({ content: 'Invalid user' });
+				// delete followUp after timout
+				setTimeout(async function() {
+					await followup.delete();
+					const reply = await interaction.fetchReply();
+					await reply.delete();
+					// delete user message
+					await message.delete();
+				}
+				, 5000);
+
 			}
 		});
 		collector.on('end', async collected => {
