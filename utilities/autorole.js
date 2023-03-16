@@ -53,7 +53,7 @@ async function assignRoles(member) {
 				embedcreator.sendError(error);
 			}
 		}
-		embedcreator.log(`Assigned roles to ${member.user.tag}`);
+		return embedcreator.log(`Assigned roles to ${member.user.tag}`);
 	}
 	catch (error) {
 		console.error(error);
