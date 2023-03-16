@@ -11,6 +11,7 @@ const figlet = require('figlet');
 const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
 const CustomVC = require('./utilities/custom-vc.js');
+const autorole = require('./utilities/autorole.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -46,6 +47,8 @@ global.client.once('ready', async () => {
 	await db.query('CREATE TABLE IF NOT EXISTS settings (setting VARCHAR(255) PRIMARY KEY, value BOOLEAN)');
 	// create custom vc table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS custom_vc (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255))');
+	// create auto role table if it doesn't exist
+	await db.query('CREATE TABLE IF NOT EXISTS auto_role (role_id VARCHAR(255) PRIMARY KEY)');
 	db.end();
 }
 )();
@@ -103,15 +106,29 @@ global.client.on('guildMemberAdd', async member => {
 		}
 	}
 	greet.sendNotify(member);
-	setTimeout(() => {
-		greet.sendWelcome(member);
-	}, 500);
+
 	// Update presence
 	const guild = global.client.guilds.cache.get(env.discord.guild);
 	const members = await guild.members.fetch();
 	global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
 },
 );
+
+global.client.on('guildMemberUpdate', async (oldMember, newMember) => {
+	try {
+		if (oldMember.pending && !newMember.pending) {
+			setTimeout(async () => {
+				await greet.sendWelcome(newMember);
+			}, 500);
+			await autorole.assignRoles(newMember);
+
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
 
 global.client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
