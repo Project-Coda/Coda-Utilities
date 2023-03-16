@@ -5,7 +5,7 @@ const env = require('../env.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('autorole')
-		.setDescription('confiugure autoroles')
+		.setDescription('confiugure auto roles')
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('add')
@@ -27,7 +27,7 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('list')
-				.setDescription('lists all autoroles'),
+				.setDescription('lists all auto roles'),
 		),
 	async execute(interaction) {
 		try {
@@ -62,7 +62,7 @@ module.exports = {
 				await autorole.add(role.id);
 				return interaction.reply({
 					embeds: [embedcreator.setembed({
-						title: 'Autorole Added',
+						title: 'Auto Role Added',
 						description: `Added ${role} to the autorole list.`,
 						color: 0x2ecc71,
 					})],
@@ -73,7 +73,7 @@ module.exports = {
 				await autorole.remove(role.id);
 				return interaction.reply({
 					embeds: [embedcreator.setembed({
-						title: 'Autorole Removed',
+						title: 'Auto Role Removed',
 						description: `Removed ${role} from the autorole list.`,
 						color: 0x2ecc71,
 					})],
@@ -88,7 +88,7 @@ module.exports = {
 				}
 				return interaction.reply({
 					embeds: [embedcreator.setembed({
-						title: 'Autoroles',
+						title: 'Auto Roles',
 						description: roleNames.join(', '),
 						color: 0x2ecc71,
 					})],
