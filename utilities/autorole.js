@@ -46,13 +46,14 @@ async function assignRoles(member) {
 		const roles = await list();
 		for (const role of roles) {
 			try {
-				member.roles.add(role);
+				await member.roles.add(role);
 			}
 			catch (error) {
 				console.error(error);
 				embedcreator.sendError(error);
 			}
 		}
+		embedcreator.log(`Assigned roles to ${member.user.tag}`);
 	}
 	catch (error) {
 		console.error(error);
