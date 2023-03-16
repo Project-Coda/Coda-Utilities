@@ -5,7 +5,7 @@ const env = require('../env.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('autorole')
-		.setDescription('confiugure autoroles')
+		.setDescription('confiugure auto roles')
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('add')
@@ -27,7 +27,7 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('list')
-				.setDescription('lists all autoroles'),
+				.setDescription('lists all auto roles'),
 		),
 	async execute(interaction) {
 		try {
@@ -53,61 +53,51 @@ module.exports = {
 				}
 				catch (error) {
 					console.log(error);
-
-				}
-				const subcommand = await interaction.options.getSubcommand();
-				if (subcommand === 'add') {
-					const role = await interaction.options.getRole('role');
-					await autorole.add(role.id);
-					return interaction.reply({
-						embeds: [embedcreator.setembed({
-							title: 'Autorole Added',
-							description: `Added ${role} to the autorole list.`,
-							color: 0x2ecc71,
-						})],
-					});
-				}
-				if (subcommand === 'remove') {
-					const role = await interaction.options.getRole('role');
-					await autorole.remove(role.id);
-					return interaction.reply({
-						embeds: [embedcreator.setembed({
-							title: 'Autorole Removed',
-							description: `Removed ${role} from the autorole list.`,
-							color: 0x2ecc71,
-						})],
-					});
-
-				}
-				if (subcommand === 'list') {
-					const roles = await autorole.list();
-					const roleNames = [];
-					for (const role of roles) {
-						roleNames.push(`<@&${role}>`);
-					}
-					return interaction.reply({
-						embeds: [embedcreator.setembed({
-							title: 'Autoroles',
-							description: roleNames.join(', '),
-							color: 0x2ecc71,
-						})],
-					});
+					embedcreator.sendError(error);
 				}
 			}
+			const subcommand = await interaction.options.getSubcommand();
+			if (subcommand === 'add') {
+				const role = await interaction.options.getRole('role');
+				await autorole.add(role.id);
+				return interaction.reply({
+					embeds: [embedcreator.setembed({
+						title: 'Auto Role Added',
+						description: `Added ${role} to the autorole list.`,
+						color: 0x2ecc71,
+					})],
+				});
+			}
+			if (subcommand === 'remove') {
+				const role = await interaction.options.getRole('role');
+				await autorole.remove(role.id);
+				return interaction.reply({
+					embeds: [embedcreator.setembed({
+						title: 'Auto Role Removed',
+						description: `Removed ${role} from the autorole list.`,
+						color: 0x2ecc71,
+					})],
+				});
+
+			}
+			if (subcommand === 'list') {
+				const roles = await autorole.list();
+				const roleNames = [];
+				for (const role of roles) {
+					roleNames.push(`<@&${role}>`);
+				}
+				return interaction.reply({
+					embeds: [embedcreator.setembed({
+						title: 'Auto Roles',
+						description: roleNames.join(', '),
+						color: 0x2ecc71,
+					})],
+				});
+			}
 		}
-		catch (err) {
-			console.log(err);
-			await interaction.editReply(
-				{
-					embeds: [ embedcreator.setembed(
-						{
-							title: 'Error',
-							description: err,
-							color: 0xe74c3c,
-						},
-					)],
-				},
-			);
+		catch (error) {
+			console.error(error);
+			embedcreator.sendError(error);
 		}
 	},
 };
