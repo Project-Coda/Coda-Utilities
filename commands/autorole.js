@@ -20,7 +20,7 @@ module.exports = {
 				.setName('remove')
 				.setDescription('removes a role')
 				.addRoleOption(option =>
-					option.setName('role-name')
+					option.setName('role')
 						.setDescription('name of the role you want to remove')
 						.setRequired(true)),
 		)
@@ -59,6 +59,17 @@ module.exports = {
 			const subcommand = await interaction.options.getSubcommand();
 			if (subcommand === 'add') {
 				const role = await interaction.options.getRole('role');
+				// check if role is already in the list
+				const roles = await autorole.list();
+				if (roles.includes(role.id)) {
+					return interaction.reply({
+						embeds: [embedcreator.setembed({
+							title: 'Auto Role Already Exists',
+							description: `${role} is already in the autorole list.`,
+							color: 0xe74c3c,
+						})],
+					});
+				}
 				await autorole.add(role.id);
 				return interaction.reply({
 					embeds: [embedcreator.setembed({
@@ -70,6 +81,17 @@ module.exports = {
 			}
 			if (subcommand === 'remove') {
 				const role = await interaction.options.getRole('role');
+				// check if role is already in the list
+				const roles = await autorole.list();
+				if (!roles.includes(role.id)) {
+					return interaction.reply({
+						embeds: [embedcreator.setembed({
+							title: 'Auto Role Does Not Exist',
+							description: `${role} is not in the autorole list.`,
+							color: 0xe74c3c,
+						})],
+					});
+				}
 				await autorole.remove(role.id);
 				return interaction.reply({
 					embeds: [embedcreator.setembed({
