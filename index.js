@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType, AuditLogEvent, Events } = require('discord.js');
 const env = require('./env.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -13,7 +13,7 @@ const pkg = require('./package.json');
 const CustomVC = require('./utilities/custom-vc.js');
 const autorole = require('./utilities/autorole.js');
 global.client = new Client({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 global.client.login(env.discord.token);
@@ -269,6 +269,31 @@ global.client.on('interactionCreate', async interaction => {
 	}
 });
 
+global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
+	// define audit log variables
+	const { action, executorId, targetId, reason } = auditLog;
+	// Check only for banned users.
+	if (action == AuditLogEvent.MemberBanAdd) {
+		// Ensure the executor is cached.
+		const user = await client.users.fetch(executorId);
+		// Ensure the banned guild member is cached.
+		const banedUser = await client.users.fetch(targetId);
+		const reasonformatted = reason || 'No reason provided';
+		// Now log the output!
+		await embedcreator.banAlert(user, banedUser, reasonformatted);
+		console.log(`${user.tag} banned ${banedUser.tag}! Reason: ${reasonformatted}`);
+	}
+	else if (action == AuditLogEvent.MemberKick) {
+		// Ensure the executor is cached.
+		const user = await client.users.fetch(executorId);
+		// Ensure the banned guild member is cached.
+		const kickedUser = await client.users.fetch(targetId);
+		const reasonformatted = reason || 'No reason provided';
+		// Now you can log the output!
+		await embedcreator.kickAlert(user, kickedUser, reasonformatted);
+		console.log(`${user.tag} kicked ${kickedUser.tag}! Reason: ${reasonformatted}`);
+	}
+});
 
 process.on('unhandledRejection', error => {
 	console.error(error);

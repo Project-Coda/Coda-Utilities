@@ -44,4 +44,90 @@ var alert = function(message){
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>', embeds: [embed] });
 };
-module.exports = { setembed, sendError, log, alert };
+var banAlert = async function(userbanning, userbanned, reason){
+	try {
+		var embed = setembed({
+			title: '🚨 Ban Alert 🚨',
+			description: `${userbanning} has banned ${userbanned} from the server.`,
+			thumbnail: {
+				url: `${userbanned.displayAvatarURL({ dynamic: true })}`,
+			},
+			fields: [
+				{
+					name: 'Reason',
+					value: `${reason}`,
+				},
+				{
+					name: 'User ID',
+					value: `${userbanned.id}`,
+				},
+				{
+					name: 'User Tag',
+					value: `${userbanned.tag}`,
+				},
+				{
+					name: 'Joined Discord',
+					value: `${userbanned.createdAt}`,
+				},
+				{
+					name: 'Mod ID',
+					value: `${userbanning.id}`,
+				},
+				{
+					name: 'Mod Tag',
+					value: `${userbanning.tag}`,
+				},
+			],
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${userbanning} has banned ${userbanned}`, embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+		sendError(err);
+	}
+};
+var kickAlert = async function(userkicking, userkicked, reason){
+	try {
+		var embed = setembed({
+			title: '🚨 Kick Alert 🚨',
+			description: `${userkicking} has kicked ${userkicked} from the server.`,
+			thumbnail: {
+				url: `${userkicked.displayAvatarURL({ dynamic: true })}`,
+			},
+			fields: [
+				{
+					name: 'Reason',
+					value: `${reason}`,
+				},
+				{
+					name: 'User ID',
+					value: `${userkicked.id}`,
+				},
+				{
+					name: 'User Tag',
+					value: `${userkicked.tag}`,
+				},
+				{
+					name: 'Joined Discord',
+					value: `${userkicked.createdAt}`,
+				},
+				{
+					name: 'Mod ID',
+					value: `${userkicking.id}`,
+				},
+				{
+					name: 'Mod Tag',
+					value: `${userkicking.tag}`,
+				},
+			],
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${userkicking} has kicked ${userkicked}`, embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+		sendError(err);
+	}
+};
+module.exports = { setembed, sendError, log, alert, banAlert, kickAlert };
