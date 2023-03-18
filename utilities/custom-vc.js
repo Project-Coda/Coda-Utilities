@@ -246,7 +246,16 @@ async function transferOwnership(olduser, newuser, channelid) {
 		channel.permissionOverwrites.set([
 			{
 				id: newuser,
-				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
+				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.ManageChannels,
+					PermissionFlagsBits.ManageRoles,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Connect,
+					PermissionFlagsBits.Speak,
+				],
 			},
 		],
 		);
@@ -336,11 +345,26 @@ async function Create(newState) {
 		permissionOverwrites: [
 			{
 				id: member.id,
-				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
+				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.ManageChannels,
+					PermissionFlagsBits.ManageRoles,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Connect,
+					PermissionFlagsBits.Speak,
+				],
 			},
 			{
 				id: newState.guild.roles.everyone,
-				allow: [PermissionFlagsBits.ViewChannel],
+				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Speak,
+				],
 			},
 		],
 	});
