@@ -32,7 +32,7 @@ async function buttonResponder(interaction) {
 		return;
 	}
 	if (buttonid === 'deletechannel') {
-		interaction.reply({ content: 'Channel deleted' });
+		await interaction.reply({ content: 'Channel deleted' });
 		await deleteChannel(userchannel);
 	}
 	if (buttonid === 'renamechannel') {
@@ -126,10 +126,10 @@ async function buttonResponder(interaction) {
 		});
 	}
 	if (buttonid === 'transferownership') {
-		interaction.reply({ content: 'Please mention the new owner' });
+		await interaction.reply({ content: 'Please mention the new owner' });
 		// message collector to collect new owner
 		const filter = m => m.author.id === interaction.user.id;
-		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = await interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newowner = await m.mentions.members.first();
 			const message = await m;
@@ -208,12 +208,13 @@ async function changeVisibility(channelid) {
 	try {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = global.client.channels.cache.get(channelid);
-		if (channel.permissionsFor(guild.roles.everyone.id).has(PermissionFlagsBits.ViewChannel)) {
-			channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false });
+		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
+		if (haspermission) {
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false, Connect: false });
 			return 'hidden';
 		}
 		else {
-			channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true });
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true, Connect: true });
 			// change button to visible
 			return 'visible';
 		}
@@ -256,6 +257,7 @@ async function transferOwnership(olduser, newuser, channelid) {
 				MoveMembers: true,
 				MuteMembers: true,
 				DeafenMembers: true,
+				UseEmbeddedActivities: true,
 			},
 		);
 	}
@@ -362,6 +364,7 @@ async function Create(newState) {
 				id: newState.guild.roles.everyone,
 				allow: [
 					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.Connect,
 					PermissionFlagsBits.Stream,
 					PermissionFlagsBits.ReadMessageHistory,
 					PermissionFlagsBits.SendMessages,
