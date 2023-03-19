@@ -7,7 +7,6 @@ collector = false;
 async function getMaxBitrate() {
 	// get max bitrate from discord
 	const guild = global.client.guilds.cache.get(env.discord.guild);
-	console.log(guild);
 	const maxbitrate = await guild.premiumTier;
 	// convert to bitrate
 	if (maxbitrate === 0) {
@@ -55,7 +54,7 @@ async function buttonResponder(interaction) {
 				await reply.delete();
 				// delete user message
 				await message.delete();
-			}, 5000);
+			}, 1000);
 			const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 			await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 			// cleanup old embed
@@ -70,7 +69,7 @@ async function buttonResponder(interaction) {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
-				}, 5000);
+				}, 1000);
 			}
 		});
 	}
@@ -94,7 +93,7 @@ async function buttonResponder(interaction) {
 					await reply.delete();
 					// delete user message
 					await message.delete();
-				}, 5000);
+				}, 1000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 				// cleanup old embed
@@ -111,7 +110,7 @@ async function buttonResponder(interaction) {
 					// delete user message
 					await message.delete();
 				}
-				, 5000);
+				, 1000);
 			}
 		});
 		collector.on('end', async collected => {
@@ -122,7 +121,7 @@ async function buttonResponder(interaction) {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
-				}, 5000);
+				}, 1000);
 			}
 		});
 	}
@@ -146,7 +145,7 @@ async function buttonResponder(interaction) {
 					await reply.delete();
 					// delete user message
 					await message.delete();
-				}, 5000);
+				}, 1000);
 				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
 				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 				// cleanup old embed
@@ -163,7 +162,7 @@ async function buttonResponder(interaction) {
 					// delete user message
 					await message.delete();
 				}
-				, 5000);
+				, 1000);
 			}
 		});
 		collector.on('end', async collected => {
@@ -174,7 +173,7 @@ async function buttonResponder(interaction) {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
-				}, 5000);
+				}, 1000);
 			}
 		});
 	}
@@ -185,9 +184,9 @@ async function buttonResponder(interaction) {
 		setTimeout(async function() {
 			const reply = await interaction.fetchReply();
 			await reply.delete();
-		}, 5000);
+		}, 1000);
 		const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-		interaction.followUp({ content: content, embeds: [embed], components: [row] });
+		await interaction.followUp({ content: content, embeds: [embed], components: [row] });
 		// cleanup old embed
 		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 		await oldembed.delete();
@@ -209,7 +208,7 @@ async function changeVisibility(channelid) {
 	try {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = global.client.channels.cache.get(channelid);
-		if (channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel)) {
+		if (channel.permissionsFor(guild.roles.everyone.id).has(PermissionFlagsBits.ViewChannel)) {
 			channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false });
 			return 'hidden';
 		}
@@ -240,15 +239,24 @@ async function changeUserLimit(channelid, newlimit) {
 async function transferOwnership(olduser, newuser, channelid) {
 	try {
 	// set vc perms
-		const channel = global.client.channels.cache.get(channelid);
+		const channel = await global.client.channels.cache.get(channelid);
 		// set perms
-		channel.permissionOverwrites.delete(olduser);
-		channel.permissionOverwrites.set([
+		await channel.permissionOverwrites.delete(olduser);
+		await channel.permissionOverwrites.edit(
+			newuser,
 			{
-				id: newuser,
-				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
+				ViewChannel: true,
+				ManageChannels: true,
+				ManageRoles: true,
+				Stream: true,
+				ReadMessageHistory: true,
+				SendMessages: true,
+				Connect: true,
+				Speak: true,
+				MoveMembers: true,
+				MuteMembers: true,
+				DeafenMembers: true,
 			},
-		],
 		);
 	}
 	catch (error) {
@@ -335,12 +343,30 @@ async function Create(newState) {
 		// allow user to manage channel
 		permissionOverwrites: [
 			{
-				id: member.id,
-				allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageRoles],
+				id: userid,
+				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.ManageChannels,
+					PermissionFlagsBits.ManageRoles,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Connect,
+					PermissionFlagsBits.Speak,
+					PermissionFlagsBits.MoveMembers,
+					PermissionFlagsBits.MuteMembers,
+					PermissionFlagsBits.DeafenMembers,
+				],
 			},
 			{
 				id: newState.guild.roles.everyone,
-				allow: [PermissionFlagsBits.ViewChannel],
+				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Speak,
+				],
 			},
 		],
 	});
