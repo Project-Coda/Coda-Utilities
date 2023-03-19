@@ -247,7 +247,7 @@ async function sendRelease(answers, attachmenturl) {
 			{
 				name: '',
 				avatarURL: '',
-				content: '<@&' + env.utilities.releases.release_role + '>',
+				content: '<@&' + env.utilities.releases.release_role + '>' + ' New Release from ' + artist,
 				embeds: [embed],
 			});
 	}
