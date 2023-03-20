@@ -2,10 +2,12 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const autorole = require('../utilities/autorole.js');
 const env = require('../env.js');
+const { PermissionFlagsBits } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('autorole')
 		.setDescription('confiugure auto roles')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('add')
