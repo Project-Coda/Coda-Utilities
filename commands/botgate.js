@@ -3,10 +3,12 @@ const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
 const botgate = require('../utilities/botgate.js');
+const { PermissionFlagsBits } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('botgate')
 		.setDescription('botgate command')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('status')
@@ -24,7 +26,7 @@ module.exports = {
 		),
 	async execute(interaction) {
 		// Limit command to Founders and Mods
-		if (!(interaction.member.roles.cache.has(env.discord.admin_role) || interaction.member.roles.cache.has(env.discord.mod_role))) {
+		if (!(interaction.member.roles.cache.has(env.discord.admin_role))) {
 			global.client.channels.cache.get(env.discord.logs_channel).send({
 				embeds: [ embedcreator.setembed(
 					{

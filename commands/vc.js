@@ -1,10 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
+const { PermissionFlagsBits } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('vc')
 		.setDescription('Allows you to bulk move people to a voice channel')
+		.setDefaultMemberPermissions(PermissionFlagsBits.MoveMembers)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('move')

@@ -2,8 +2,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { GenerateImage } = require('../utilities/openai.js');
 const { inlineCode } = require('discord.js');
-
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('codagenerate')

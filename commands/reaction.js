@@ -3,10 +3,12 @@ const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
 const emojiUnicode = require('emoji-unicode');
+const { PermissionFlagsBits } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reaction')
 		.setDescription('reaction roles')
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('add')
