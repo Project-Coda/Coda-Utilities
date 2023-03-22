@@ -12,6 +12,7 @@ const botgate = require('./utilities/botgate.js');
 const pkg = require('./package.json');
 const CustomVC = require('./utilities/custom-vc.js');
 const autorole = require('./utilities/autorole.js');
+const vctools = require('./utilities/vc-tools.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -248,6 +249,7 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 	if (newUserChannel === createcustomvc) {
 		CustomVC.Create(newState);
 	}
+	await vctools.setBitrate();
 });
 
 // listen for button interactions

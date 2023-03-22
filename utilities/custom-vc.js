@@ -2,26 +2,8 @@ const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, Butto
 const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
+const { getMaxBitrate } = require('./vc-tools.js');
 collector = false;
-// get max bitrate
-async function getMaxBitrate() {
-	// get max bitrate from discord
-	const guild = global.client.guilds.cache.get(env.discord.guild);
-	const maxbitrate = await guild.premiumTier;
-	// convert to bitrate
-	if (maxbitrate === 0) {
-		return 96000;
-	}
-	if (maxbitrate === 1) {
-		return 128000;
-	}
-	if (maxbitrate === 2) {
-		return 256000;
-	}
-	if (maxbitrate === 3) {
-		return 384000;
-	}
-}
 async function buttonResponder(interaction) {
 	const buttonid = interaction.customId;
 	const userchannel = await checkUser(interaction.user.id);
