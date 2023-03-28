@@ -110,7 +110,7 @@ var kickAlert = async function(userkicking, userkicked, reason){
 				},
 				{
 					name: 'Joined Discord',
-					value: `${userkicked.createdAt}`,
+					value: `<t:${parseInt(userkicked.createdTimestamp / 1000, 10)}:F>`,
 				},
 				{
 					name: 'Mod ID',
@@ -130,4 +130,43 @@ var kickAlert = async function(userkicking, userkicked, reason){
 		sendError(err);
 	}
 };
-module.exports = { setembed, sendError, log, alert, banAlert, kickAlert };
+var mentionAlert = async function(message){
+	try {
+		var embed = setembed({
+			title: '🚨 Mass Mention Alert 🚨',
+			description: `${message.author} has mass mentioned in ${message.channel}`,
+			thumbnail: {
+				url: `${message.member.displayAvatarURL({ dynamic: true })}`,
+			},
+			fields: [
+				{
+					name: 'Message Content',
+					value: `${message.content}`,
+				},
+				{
+					name: 'User ID',
+					value: `${message.author.id}`,
+				},
+				{
+					name: 'User Tag',
+					value: `${message.author.tag}`,
+				},
+				{
+					name: 'Joined Discord',
+					value: `<t:${parseInt(message.author.createdTimestamp / 1000, 10)}:F>`,
+				},
+				{
+					name: 'Joined Server',
+					value: `<t:${parseInt(message.member.joinedTimestamp / 1000, 10)}:F>`,
+				},
+			],
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${message.member} attempted to mass mention`, embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+		sendError(err);
+	}
+};
+module.exports = { setembed, sendError, log, alert, banAlert, kickAlert, mentionAlert };
