@@ -13,6 +13,7 @@ const pkg = require('./package.json');
 const CustomVC = require('./utilities/custom-vc.js');
 const autorole = require('./utilities/autorole.js');
 const vctools = require('./utilities/vc-tools.js');
+const { checkMention } = require('./utilities/message-filter.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -84,6 +85,11 @@ const rest = new REST({ version: '9' }).setToken(env.discord.token);
 		embedcreator.sendError(error);
 	}
 })();
+global.client.on('messageCreate', async message => {
+	if (message.author.bot) return;
+	checkMention(message);
+},
+);
 
 global.client.on('guildMemberAdd', async member => {
 
