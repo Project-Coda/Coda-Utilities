@@ -6,16 +6,25 @@
     "commitMessagePrefix": "⬆️",
     "dependencyDashboard": true,
     "updatePinnedDependencies": true,
+
     "packageRules": [
         {
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
           "automerge": true,
-          "platformAutomerge": true
+          "platformAutomerge": true,
+          "fileMatch": [
+            "package.json",
+            "package-lock.json"
+            ]
         },
         {
             "matchDepTypes": ["devDependencies"],
             "automerge": true,
-            "platformAutomerge": true
+            "platformAutomerge": true,
+            "fileMatch": [
+              "package.json",
+              "package-lock.json"
+              ]
         },
         {
             "matchDatasources": ["github-tags"],
