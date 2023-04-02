@@ -17,6 +17,11 @@
         {
             "matchDatasources": ["github-tags"],
             "automerge": true
+        },
+        {
+            "matchPackageNames": ["node-fetch"],
+            "matchUpdateTypes": ["major"],
+            "enabled": false
         }
       ]
   }
