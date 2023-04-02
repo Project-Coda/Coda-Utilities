@@ -7,7 +7,6 @@
     "dependencyDashboard": true,
     "packageRules": [
         {
-          "matchDepTypes": ["dependencies"],
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
           "automerge": true,
           "platformAutomerge": true
