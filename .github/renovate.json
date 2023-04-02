@@ -6,8 +6,11 @@
     "commitMessagePrefix": "⬆️",
     "dependencyDashboard": true,
     "updatePinnedDependencies": true,
-    "rangeStrategy": "replace",
     "packageRules": [
+        {
+          "matchDatasources": ["npm"],
+          "rangeStrategy": "replace"
+        },
         {
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
           "automerge": true,
