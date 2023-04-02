@@ -1,7 +1,8 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-      "config:base"
+      "config:base",
+      ":maintainLockFilesWeekly"
     ],
     "commitMessagePrefix": "⬆️",
     "dependencyDashboard": true,
@@ -9,6 +10,8 @@
     "updatePinnedDependencies": true,
     "packageRules": [
         {
+          "matchDatasources": ["npm"],
+          "matchDepTypes": ["dependencies"],
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
           "automerge": true,
           "platformAutomerge": true
