@@ -5,6 +5,8 @@
     ],
     "commitMessagePrefix": "⬆️",
     "dependencyDashboard": true,
+    "updateLockFiles": true,
+    "updatePinnedDependencies": true,
     "packageRules": [
         {
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
