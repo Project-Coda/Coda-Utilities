@@ -22,15 +22,15 @@
     "nodemon": "^2.0.22"
   },
   "dependencies": {
-    "@discordjs/rest": "^1.6.0",
-    "@tonaljs/tonal": "^4.10.0",
-    "discord-api-types": "^0.37.37",
-    "discord.js": "^14.8.0",
-    "emoji-unicode": "^2.0.1",
-    "figlet": "^1.5.2",
-    "lodash": "^4.17.21",
-    "mariadb": "^3.1.1",
-    "node-fetch": "^2.6.9",
-    "openai": "^3.2.1"
+    "@discordjs/rest": "1.6.0",
+    "@tonaljs/tonal": "4.10.0",
+    "discord-api-types": "0.37.37",
+    "discord.js": "14.8.0",
+    "emoji-unicode": "2.0.1",
+    "figlet": "1.5.2",
+    "lodash": "4.17.21",
+    "mariadb": "3.1.1",
+    "node-fetch": "2.6.9",
+    "openai": "3.2.1"
   }
 }
