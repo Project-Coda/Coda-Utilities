@@ -8,15 +8,18 @@
     "packageRules": [
         {
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-          "automerge": true
+          "automerge": true,
+          "platformAutomerge": true
         },
         {
             "matchDepTypes": ["devDependencies"],
-            "automerge": true
+            "automerge": true,
+            "platformAutomerge": true
         },
         {
             "matchDatasources": ["github-tags"],
-            "automerge": true
+            "automerge": true,
+            "platformAutomerge": true
         },
         {
             "matchPackageNames": ["node-fetch"],
