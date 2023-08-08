@@ -352,7 +352,7 @@ async function Create(newState) {
 				],
 			},
 			{
-				id: env.discord.enviroment_role,
+				id: env.discord.environment_role,
 				deny: [
 					PermissionFlagsBits.ViewChannel,
 					PermissionFlagsBits.Connect,
