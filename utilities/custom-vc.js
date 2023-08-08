@@ -330,8 +330,6 @@ async function Create(newState) {
 				id: userid,
 				allow: [
 					PermissionFlagsBits.ViewChannel,
-					PermissionFlagsBits.ManageChannels,
-					PermissionFlagsBits.ManageRoles,
 					PermissionFlagsBits.Stream,
 					PermissionFlagsBits.ReadMessageHistory,
 					PermissionFlagsBits.SendMessages,
@@ -345,6 +343,17 @@ async function Create(newState) {
 			{
 				id: newState.guild.roles.everyone,
 				allow: [
+					PermissionFlagsBits.ViewChannel,
+					PermissionFlagsBits.Connect,
+					PermissionFlagsBits.Stream,
+					PermissionFlagsBits.ReadMessageHistory,
+					PermissionFlagsBits.SendMessages,
+					PermissionFlagsBits.Speak,
+				],
+			},
+			{
+				id: env.discord.enviroment_role,
+				deny: [
 					PermissionFlagsBits.ViewChannel,
 					PermissionFlagsBits.Connect,
 					PermissionFlagsBits.Stream,
@@ -468,6 +477,70 @@ async function Cleanup() {
 		embedcreator.sendError(error);
 	}
 }
+async function addUsertoVC(newState) {
+	try {
+		// check if channel is a custom vc
+		const channels = await getChannels();
+		if (channels.includes(newState.channelId)) {
+			// edit channel permissions so user can view channel
+			const channel = await global.client.channels.cache.get(newState.channelId);
+			// edit channel permissions the user themselves can view the channel
+			await channel.permissionOverwrites.edit(newState.member.id, {
+				ViewChannel: true,
+				Connect: true,
+				Stream: true,
+				ReadMessageHistory: true,
+				SendMessages: true,
+				Speak: true,
+			});
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+async function removeUserfromVC(oldState) {
+	try {
+		const channels = await getChannels();
+		if (channels.includes(oldState.channelId)) {
+			const channel = await global.client.channels.cache.get(oldState.channelId);
+			// check if channel is empty
+			if (channel.members.size == 0) {
+				return;
+			}
+			else {
+				// edit channel permissions so user can't view channel
+				await channel.permissionOverwrites.delete(oldState.member.id);
+			}
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+async function setUserCustomVCPermissions(newState, oldState) {
+	try {
+		if (newState.channelId == oldState.channelId) {
+			return;
+		}
+		else if (newState.channelId == null) {
+			await removeUserfromVC(oldState);
+		}
+		else if (oldState.channelId == null) {
+			await addUsertoVC(newState);
+		}
+		else {
+			await removeUserfromVC(oldState);
+			await addUsertoVC(newState);
+		}
 
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
 
-module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder };
+module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions };

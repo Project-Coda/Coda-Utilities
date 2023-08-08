@@ -256,6 +256,7 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		CustomVC.Create(newState);
 	}
 	await vctools.setBitrate();
+	await CustomVC.setUserCustomVCPermissions(newState, oldState);
 });
 
 // listen for button interactions
