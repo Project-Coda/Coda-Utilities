@@ -1,6 +1,6 @@
 {
   "name": "coda-utilities",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
