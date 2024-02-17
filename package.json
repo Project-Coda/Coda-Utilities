@@ -1,10 +1,10 @@
 {
   "name": "coda-utilities",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon .",
+    "dev": "nodemon .",
     "start": "node index.js"
   },
   "author": "Matheson Steplock (ikifar2012)",

@@ -15,7 +15,8 @@
 			"extensions": [
 				"dbaeumer.vscode-eslint",
 				"GitHub.copilot",
-				"VisualStudioExptTeam.vscodeintellicode"
+				"VisualStudioExptTeam.vscodeintellicode",
+				"ms-azuretools.vscode-docker"
 			]
 		}
 	},
