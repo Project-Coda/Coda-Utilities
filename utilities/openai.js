@@ -1,30 +1,21 @@
-const { Configuration, OpenAIApi } = require('openai');
+const { OpenAI } = require('openai');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
-async function getOpenAI() {
-	try {
-		const configuratuion = new Configuration({
-			apiKey: env.utilities.openai,
-		});
-		const openai = new OpenAIApi(configuratuion);
-		return openai;
-	}
-	catch (err) {
-		console.log(err);
-		embedcreator.sendError(err);
-	}
-}
+
+const openai = new OpenAI({
+	apiKey: env.utilities.openai,
+});
+
 async function createCompletion(prompt) {
 	try {
-		openai = await getOpenAI();
-		response = await openai.createChatCompletion({
+		response = await openai.chat.completions.create({
 			model: 'gpt-3.5-turbo',
 			messages: [{ role: 'user', content: String(prompt) }],
 			max_tokens: 300,
 		},
 		)
 			.then((response) => {
-				return response.data.choices[0].message.content;
+				return response.choices[0].message.content;
 			},
 			)
 			.catch((err) => {
@@ -44,7 +35,6 @@ async function createCompletion(prompt) {
 
 async function GenerateImage(prompt) {
 	try {
-		openai = await getOpenAI();
 		response = await openai.createImage({
 			prompt: String(prompt),
 			n: 1,
@@ -69,4 +59,4 @@ async function GenerateImage(prompt) {
 	}
 }
 
-module.exports = { getOpenAI, createCompletion, GenerateImage };
+module.exports = { createCompletion, GenerateImage };
