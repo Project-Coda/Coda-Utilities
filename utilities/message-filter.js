@@ -7,7 +7,8 @@ async function checkMention(message) {
 		if (message.member.roles.cache.has(env.discord.admin_role) || message.member.roles.cache.has(env.discord.mod_role)) return;
 		if (message.content.includes('@everyone') || message.content.includes('@here')) {
 			// increment the user's strikes
-			const strikes = await incrementStrikes(message.author.id);
+			const reason = 'Mention Spam';
+			const strikes = await incrementStrikes(message.author.id, reason);
 			await embedcreator.mentionAlert(message, strikes);
 			const embed = await embedcreator.setembed(
 					{
@@ -35,7 +36,7 @@ async function checkMention(message) {
 		embedcreator.sendError(err);
 	}
 }
-async function incrementStrikes(userID) {
+async function incrementStrikes(userID, reason) {
 	try {
 		try {
 		// get the user's current strikes
@@ -65,7 +66,7 @@ async function incrementStrikes(userID) {
 
 		}
 		if (newStrikes >= 3) {
-			await ban(userID);
+			await ban(userID, reason);
 		}
 		// return the new strike count
 		return newStrikes;
