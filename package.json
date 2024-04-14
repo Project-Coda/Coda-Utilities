@@ -1,6 +1,6 @@
 {
   "name": "coda-utilities",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "A general utilities bot for Coda",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "figlet": "^1.7.0",
     "lodash": "^4.17.21",
     "mariadb": "^3.3.0",
+    "node-cron": "^3.0.3",
     "node-fetch": "^2.7.0",
     "openai": "^4.33.0"
   }
