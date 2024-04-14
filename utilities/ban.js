@@ -31,6 +31,7 @@ async function ban(userID, message) {
 	}
 	catch (err) {
 		console.log(err);
+		embedcreator.sendError(err);
 	}
 	const guild = await global.client.guilds.fetch(env.discord.guild);
 	const member = await guild.members.fetch(userID);
