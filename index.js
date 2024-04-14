@@ -14,6 +14,7 @@ const CustomVC = require('./utilities/custom-vc.js');
 const autorole = require('./utilities/autorole.js');
 const vctools = require('./utilities/vc-tools.js');
 const { checkMention } = require('./utilities/message-filter.js');
+const nodecron = require('node-cron');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -52,7 +53,7 @@ global.client.once('ready', async () => {
 	// create auto role table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS auto_role (role_id VARCHAR(255) PRIMARY KEY)');
 	// create coda strikes table if it doesn't exist
-	await db.query('DROP TABLE IF EXISTS coda_strikes');
+	// await db.query('DROP TABLE IF EXISTS coda_strikes');
 	await db.query('CREATE TABLE IF NOT EXISTS coda_strikes (user_id VARCHAR(255) PRIMARY KEY, strikes INT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
 	db.end();
 }
@@ -306,6 +307,21 @@ global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
 		console.log(`${user.tag} kicked ${kickedUser.tag}! Reason: ${reasonformatted}`);
 	}
 });
+
+// clear coda strkes older than an hour
+nodecron.schedule('0 0 * * *', async () => {
+	try {
+		db = await mariadb.getConnection();
+		await db.query('DELETE FROM coda_strikes WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 HOUR)');
+		db.end();
+		embedcreator.log('Coda strikes older than an hour have been deleted.');
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+},
+);
 
 process.on('unhandledRejection', error => {
 	console.error(error);
