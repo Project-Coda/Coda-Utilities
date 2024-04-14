@@ -130,11 +130,11 @@ var kickAlert = async function(userkicking, userkicked, reason){
 		sendError(err);
 	}
 };
-var mentionAlert = async function(message){
+var mentionAlert = async function(message, strikenum){
 	try {
 		var embed = setembed({
 			title: '🚨 Mass Mention Alert 🚨',
-			description: `${message.author} has mass mentioned in ${message.channel}`,
+			description: `${message.author} has mass mentioned in ${message.channel}, strike ${strikenum}`,
 			thumbnail: {
 				url: `${message.member.displayAvatarURL({ dynamic: true })}`,
 			},
