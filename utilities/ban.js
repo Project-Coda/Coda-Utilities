@@ -17,8 +17,14 @@ async function ban(userID, message) {
 		embed = await embedcreator.setembed(
 			{
 				title: 'You have been banned from the server',
-				description: `If you believe this is in error, fill out the fourm out at: ${env.discord.forum}`,
+				description: 'If you believe this is in error, fill out the fourm and we will review your case, within 24 hours.',
 				color: 0xe74c3c,
+				fields: [
+					{
+						name: 'Ban Appeal Form',
+						value: env.discord.ban_appeal_form,
+					},
+				],
 			},
 		);
 		await user.send({ embeds: [embed] });
