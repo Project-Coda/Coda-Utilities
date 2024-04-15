@@ -309,7 +309,7 @@ global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
 	else if (action == AuditLogEvent.MemberBanRemove) {
 		// Ensure the executor is cached.
 		const user = await client.users.fetch(executorId);
-		// Ensure the banned guild member is cached.
+		// Ensure the unbanned guild member is cached.
 		const unbanedUser = await client.users.fetch(targetId);
 		// Now you can log the output!
 		await embedcreator.unbanAlert(user, unbanedUser);
