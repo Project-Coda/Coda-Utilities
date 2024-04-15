@@ -87,6 +87,45 @@ var banAlert = async function(userbanning, userbanned, reason){
 		sendError(err);
 	}
 };
+var unbanAlert = async function(userunbanning, userunbanned){
+	try {
+		var embed = setembed({
+			title: '🚨 Unban Alert 🚨',
+			description: `${userunbanning} has banned ${userunbanned} from the server.`,
+			thumbnail: {
+				url: `${userunbanned.displayAvatarURL({ dynamic: true })}`,
+			},
+			fields: [
+				{
+					name: 'User ID',
+					value: `${userunbanned.id}`,
+				},
+				{
+					name: 'User Tag',
+					value: `${userunbanned.tag}`,
+				},
+				{
+					name: 'Joined Discord',
+					value: `${userunbanned.createdAt}`,
+				},
+				{
+					name: 'Mod ID',
+					value: `${userunbanning.id}`,
+				},
+				{
+					name: 'Mod Tag',
+					value: `${userunbanning.tag}`,
+				},
+			],
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${userunbanning} has unbanned ${userunbanned}`, embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+		sendError(err);
+	}
+};
 var kickAlert = async function(userkicking, userkicked, reason){
 	try {
 		var embed = setembed({
@@ -169,4 +208,4 @@ var mentionAlert = async function(message, strikenum){
 		sendError(err);
 	}
 };
-module.exports = { setembed, sendError, log, alert, banAlert, kickAlert, mentionAlert };
+module.exports = { setembed, sendError, log, alert, banAlert, kickAlert, mentionAlert, unbanAlert };

@@ -306,6 +306,15 @@ global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
 		await embedcreator.kickAlert(user, kickedUser, reasonformatted);
 		console.log(`${user.tag} kicked ${kickedUser.tag}! Reason: ${reasonformatted}`);
 	}
+	else if (action == AuditLogEvent.MemberBanRemove) {
+		// Ensure the executor is cached.
+		const user = await client.users.fetch(executorId);
+		// Ensure the banned guild member is cached.
+		const unbanedUser = await client.users.fetch(targetId);
+		// Now you can log the output!
+		await embedcreator.unbanAlert(user, unbanedUser);
+		console.log(`${user.tag} unbanned ${unbanedUser.tag}!`);
+	}
 });
 
 // clear coda strkes older than an hour
