@@ -22,7 +22,7 @@
     "nodemon": "^3.1.2"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.2.0",
+    "@discordjs/rest": "^2.3.0",
     "@tonaljs/tonal": "^4.10.0",
     "discord-api-types": "^0.37.86",
     "discord.js": "^14.14.1",
