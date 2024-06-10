@@ -12,3 +12,11 @@ FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:${VARIANT}
 
 # [Optional] Uncomment if you want to install more global node modules
 RUN su node -c "npm install -g nodemon"
+RUN apt-get update && apt-get install -y \
+build-essential \
+libcairo2-dev \
+libpango1.0-dev \
+libjpeg-dev \
+libgif-dev \
+librsvg2-dev \
+&& rm -rf /var/lib/apt/lists/*
