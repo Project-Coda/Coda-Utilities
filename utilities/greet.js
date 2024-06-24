@@ -1,7 +1,6 @@
 const mariadb = require('../db.js');
 const env = require('../env.js');
 const embedcreator = require('../embed.js');
-const welcome = require('./welcome.js');
 // get users from database and put id's in array
 async function getUsers() {
 	db = await mariadb.getConnection();
@@ -111,15 +110,35 @@ async function SendNewBotAlert(member) {
 }
 
 async function sendWelcome(member) {
+	try {
 // send welcome message
 	const welcome_channel = await global.client.channels.cache.get(env.discord.welcome_channel);
-	const welcome_message = await welcome.getWelcome();
-	welcome_channel.send(
+	guild = await global.client.guilds.cache.get(env.discord.guild);
+	member_obj = await guild.members.fetch(member.id);
+	member_display_name = member_obj.displayName;
+	servername = guild.name;
+
+	const embed =  await embedcreator.setembed(
+		{
+			title: `Welcome to ${servername}!`,
+			description: `Welcome to ${servername}, ${member_obj}!`,
+			color: 0x19ebfe,
+			image: {
+				url: env.utilities.gif_link,
+			},
+		},
+	)
+	await welcome_channel.send(
 		// send message
 		{
-			content: 'Welcome to ' + global.client.guilds.cache.get(env.discord.guild).name + ` ${member.user}` + '!\n' + await welcome_message,
+			embeds: [embed],
 		},
 	);
+}
+	catch (error) {
+		embedcreator.sendError(error);
+		console.log(error);
+	}
 }
 
 module.exports = { sendNotify, getUsers, sendKickAlert, SendNewBotAlert, sendWelcome };
