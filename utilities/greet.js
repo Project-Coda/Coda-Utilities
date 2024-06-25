@@ -56,7 +56,7 @@ async function sendKickAlert(member) {
 	}
 	global.client.channels.cache.get(env.discord.logs_channel).send(
 		{
-			content: '🚨 Bot Kicked from Server 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>',
+			content: '🚨 Bot Kicked from Server 🚨' + '\n<@&' + env.discord.admin_role + '>',
 			embeds: [ embedcreator.setembed(
 				{
 					title: 'Bot Kicked',
@@ -94,7 +94,7 @@ async function SendNewBotAlert(member) {
 
 	global.client.channels.cache.get(env.discord.logs_channel).send(
 		{
-			content: '🚨 Bot Added to Server 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>',
+			content: '🚨 Bot Added to Server 🚨' + '\n<@&' + env.discord.admin_role + '>',
 			embeds: [ embedcreator.setembed(
 				{
 					title: '🚨 Bot Added 🚨',

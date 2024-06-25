@@ -36,13 +36,13 @@ var log = function(message){
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
 };
-var alert = function(message){
+var adminalert = function(message){
 	var embed = setembed({
 		title: '🚨 Alert 🚨',
 		description: `${message}`,
 		color: 0xe74c3c,
 	});
-	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>', embeds: [embed] });
+	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '>', embeds: [embed] });
 };
 var banAlert = async function(userbanning, userbanned, reason){
 	try {
@@ -208,4 +208,4 @@ var mentionAlert = async function(message, strikenum){
 		sendError(err);
 	}
 };
-module.exports = { setembed, sendError, log, alert, banAlert, kickAlert, mentionAlert, unbanAlert };
+module.exports = { setembed, sendError, log, adminalert, banAlert, kickAlert, mentionAlert, unbanAlert };
