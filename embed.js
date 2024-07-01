@@ -36,13 +36,13 @@ var log = function(message){
 	});
 	global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
 };
-var alert = function(message){
+var adminalert = function(message){
 	var embed = setembed({
 		title: '🚨 Alert 🚨',
 		description: `${message}`,
 		color: 0xe74c3c,
 	});
-	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '> <@&' + env.discord.mod_role + '>', embeds: [embed] });
+	global.client.channels.cache.get(env.discord.logs_channel).send({ content: '🚨 Critical Alert 🚨' + '\n<@&' + env.discord.admin_role + '>', embeds: [embed] });
 };
 var banAlert = async function(userbanning, userbanned, reason){
 	try {
@@ -81,6 +81,45 @@ var banAlert = async function(userbanning, userbanned, reason){
 			color: 0xe74c3c,
 		});
 		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${userbanning} has banned ${userbanned}`, embeds: [embed] });
+	}
+	catch (err) {
+		console.log(err);
+		sendError(err);
+	}
+};
+var unbanAlert = async function(userunbanning, userunbanned){
+	try {
+		var embed = setembed({
+			title: '🚨 Unban Alert 🚨',
+			description: `${userunbanning} has banned ${userunbanned} from the server.`,
+			thumbnail: {
+				url: `${userunbanned.displayAvatarURL({ dynamic: true })}`,
+			},
+			fields: [
+				{
+					name: 'User ID',
+					value: `${userunbanned.id}`,
+				},
+				{
+					name: 'User Tag',
+					value: `${userunbanned.tag}`,
+				},
+				{
+					name: 'Joined Discord',
+					value: `${userunbanned.createdAt}`,
+				},
+				{
+					name: 'Mod ID',
+					value: `${userunbanning.id}`,
+				},
+				{
+					name: 'Mod Tag',
+					value: `${userunbanning.tag}`,
+				},
+			],
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ content: `Attention <@&${env.discord.mod_role}>, ${userunbanning} has unbanned ${userunbanned}`, embeds: [embed] });
 	}
 	catch (err) {
 		console.log(err);
@@ -169,4 +208,4 @@ var mentionAlert = async function(message, strikenum){
 		sendError(err);
 	}
 };
-module.exports = { setembed, sendError, log, alert, banAlert, kickAlert, mentionAlert };
+module.exports = { setembed, sendError, log, adminalert, banAlert, kickAlert, mentionAlert, unbanAlert };
