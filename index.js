@@ -128,9 +128,9 @@ global.client.on('guildMemberAdd', async member => {
 global.client.on('guildMemberUpdate', async (oldMember, newMember) => {
 	try {
 		if (oldMember.pending && !newMember.pending) {
-			setTimeout(async () => {
-				await greet.sendWelcome(newMember);
-			}, 500);
+			// setTimeout(async () => {
+			// 	await greet.sendWelcome(newMember);
+			// }, 500);
 			await autorole.assignRoles(newMember);
 
 		}
