@@ -351,17 +351,6 @@ async function Create(newState) {
 					PermissionFlagsBits.Speak,
 				],
 			},
-			{
-				id: env.discord.environment_role,
-				deny: [
-					PermissionFlagsBits.ViewChannel,
-					PermissionFlagsBits.Connect,
-					PermissionFlagsBits.Stream,
-					PermissionFlagsBits.ReadMessageHistory,
-					PermissionFlagsBits.SendMessages,
-					PermissionFlagsBits.Speak,
-				],
-			},
 		],
 	});
 
