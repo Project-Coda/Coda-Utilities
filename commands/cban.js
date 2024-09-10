@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedcreator = require('../embed.js');
 const { ban } = require('../utilities/ban.js');
+const env = require('../env.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

@@ -66,7 +66,7 @@ module.exports = {
 					db = await mariadb.getConnection();
 					db.query('UPDATE settings SET value = ? WHERE setting = ?', [1, 'botgate']);
 					db.end();
-					embedcreator.alert(`Botgate Enabled by ${interaction.member.user}`);
+					embedcreator.adminalert(`Botgate Enabled by ${interaction.member.user}`);
 					return interaction.reply({
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Enabled',
@@ -79,7 +79,7 @@ module.exports = {
 					db = await mariadb.getConnection();
 					db.query('UPDATE settings SET value = ? WHERE setting = ?', [0, 'botgate']);
 					db.end();
-					embedcreator.alert(`Botgate Disabled by ${interaction.member.user}`);
+					embedcreator.adminalert(`Botgate Disabled by ${interaction.member.user}`);
 					return interaction.reply({
 						embeds: [embedcreator.setembed({
 							title: 'Botgate Disabled',
