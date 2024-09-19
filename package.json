@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Project-Coda/Coda-Utilities#readme",
   "devDependencies": {
     "eslint": "^9.10.0",
-    "nodemon": "^3.1.5"
+    "nodemon": "^3.1.6"
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.0",
