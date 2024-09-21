@@ -24,7 +24,7 @@ async function setBitrate() {
 		const guild = await global.client.guilds.cache.get(env.discord.guild);
 		const maxbitrate = await getMaxBitrate();
 		const channels = await guild.channels.cache.filter(channel => channel.type === 2 && channel.bitrate !== maxbitrate);
-		channels.forEach(async channel => {
+		await channels.forEach(async channel => {
 			await channel.setBitrate(maxbitrate);
 			bitrate = maxbitrate / 1000;
 			embedcreator.log(`Set bitrate of ${channel} to ${bitrate}kbps`);
