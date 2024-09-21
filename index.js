@@ -41,7 +41,7 @@ global.client.once('ready', async () => {
 	db = await mariadb.getConnection();
 	// drop table if it exists
 	// only for testing
-	// await db.query('DROP TABLE IF EXISTS roles');
+	// await db.query('DROP TABLE IF EXISTS custom_vc');
 	// create roles table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS roles (id VARCHAR(255) PRIMARY KEY, emoji VARCHAR(255), raw_emoji VARCHAR(255), message_id VARCHAR(255), channel_id VARCHAR(255)) COLLATE utf8mb4_general_ci CHARSET utf8mb4;');
 	// create notify table if it doesn't exist
@@ -49,7 +49,7 @@ global.client.once('ready', async () => {
 	// create settings table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS settings (setting VARCHAR(255) PRIMARY KEY, value BOOLEAN)');
 	// create custom vc table if it doesn't exist
-	await db.query('CREATE TABLE IF NOT EXISTS custom_vc (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255))');
+	await db.query('CREATE TABLE IF NOT EXISTS custom_vc (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255), ask_to_join_vc VARCHAR(255))');
 	// create auto role table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS auto_role (role_id VARCHAR(255) PRIMARY KEY)');
 	// create coda strikes table if it doesn't exist

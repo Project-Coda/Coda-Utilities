@@ -193,11 +193,13 @@ async function changeVisibility(channelid) {
 		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
 		if (haspermission) {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false, Connect: false });
+			await createAskToJoin(channelid);
 			return 'hidden';
 		}
 		else {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true, Connect: true });
 			// change button to visible
+			await deleteAskToJoin(channelid);
 			return 'visible';
 		}
 	}
@@ -284,6 +286,7 @@ async function getChannels() {
 async function deleteChannel(channel_id) {
 	try {
 		const db = await mariadb.getConnection();
+		ask_to_join_vc = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channel_id]);
 		await db.query('DELETE FROM custom_vc WHERE channel_id = ?', [channel_id]);
 		db.end();
 	}
@@ -295,7 +298,9 @@ async function deleteChannel(channel_id) {
 		if (global.client.channels.cache.get(channel_id)){
 			await global.client.channels.cache.get(channel_id).delete();
 		}
-
+		if (ask_to_join_vc[0].ask_to_join_vc) {
+			await global.client.channels.cache.get(ask_to_join_vc[0].ask_to_join_vc).delete();
+		}
 	}
 	catch (error) {
 		console.error(error);
@@ -530,6 +535,56 @@ async function setUserCustomVCPermissions(newState, oldState) {
 		console.error(error);
 		embedcreator.sendError(error);
 	}
+}
+
+async function createAskToJoin(linkedchannel) {
+	try {
+	// create an ask to join channel for the linked channel in the ask to join category
+	const guild = await global.client.guilds.cache.get(env.discord.guild);
+	const category = await guild.channels.cache.get(env.utilities.customvc.asktojoin);
+	const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
+	const channel = await guild.channels.create({
+		type: ChannelType.GuildVoice,
+		name: 'Ask to join ' + linkedchannelobj.name,
+		parent: category,
+		permissionOverwrites: [
+			{
+				id: guild.roles.everyone,
+				deny: [
+					PermissionFlagsBits.Connect,
+				],
+			},
+		],
+	});
+	const db = await mariadb.getConnection();
+	console.log('created ask to join channel for ' + linkedchannel);
+	await db.query('UPDATE custom_vc SET ask_to_join_vc = ? WHERE channel_id = ?', [channel.id, linkedchannel]);
+	db.end();
+	return channel;
+}
+catch (error) {
+	console.error(error);
+	embedcreator.sendError(error);
+}
+}
+async function deleteAskToJoin(linkedchannel) {
+	// delete the ask to join channel for the linked channel
+	const db = await mariadb.getConnection();
+	const rows = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [linkedchannel]);
+	db.end();
+	try {
+		if (rows[0].ask_to_join_vc) {
+			const channel = await global.client.channels.cache.get(rows[0].ask_to_join_vc);
+			await channel.delete();
+		}
+		const db = await mariadb.getConnection();
+		await db.query('UPDATE custom_vc SET ask_to_join_vc = NULL WHERE channel_id = ?', [linkedchannel]);
+		db.end();
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+}
 }
 
 module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions };
