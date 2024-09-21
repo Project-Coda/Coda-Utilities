@@ -30,7 +30,7 @@ async function buttonResponder(interaction) {
 			await renameChannel(userchannel, newname);
 			followup = await interaction.followUp({ content: 'Channel renamed to ' + newname });
 			// delete reply after timout
-			setTimeout(async function() {
+			setTimeout(async function () {
 				await followup.delete();
 				const reply = await interaction.fetchReply();
 				await reply.delete();
@@ -47,7 +47,7 @@ async function buttonResponder(interaction) {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -69,7 +69,7 @@ async function buttonResponder(interaction) {
 				await changeUserLimit(userchannel, newlimit);
 				followup = await interaction.followUp({ content: 'User limit changed to ' + newlimit });
 				// delete reply after timout
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -85,21 +85,21 @@ async function buttonResponder(interaction) {
 			else {
 				followup = await interaction.followUp({ content: 'Invalid user limit' });
 				// delete followUp after timout
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
 					// delete user message
 					await message.delete();
 				}
-				, 1000);
+					, 1000);
 			}
 		});
 		collector.on('end', async collected => {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -121,7 +121,7 @@ async function buttonResponder(interaction) {
 				await transferOwnership(userid, newowner.user.id, userchannel);
 				followup = await interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
 				// delete reply after timout
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -137,21 +137,21 @@ async function buttonResponder(interaction) {
 			else {
 				followup = await interaction.followUp({ content: 'Invalid user' });
 				// delete followUp after timout
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
 					// delete user message
 					await message.delete();
 				}
-				, 1000);
+					, 1000);
 			}
 		});
 		collector.on('end', async collected => {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function() {
+				setTimeout(async function () {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -163,7 +163,7 @@ async function buttonResponder(interaction) {
 		const status = await changeVisibility(userchannel);
 		await interaction.reply({ content: 'Visibility changed to ' + status });
 		// delete reply after timout
-		setTimeout(async function() {
+		setTimeout(async function () {
 			const reply = await interaction.fetchReply();
 			await reply.delete();
 		}, 1000);
@@ -223,7 +223,7 @@ async function changeUserLimit(channelid, newlimit) {
 // Transfer Ownership
 async function transferOwnership(olduser, newuser, channelid) {
 	try {
-	// set vc perms
+		// set vc perms
 		const channel = await global.client.channels.cache.get(channelid);
 		// set perms
 		await channel.permissionOverwrites.delete(olduser);
@@ -295,7 +295,7 @@ async function deleteChannel(channel_id) {
 		embedcreator.sendError(error);
 	}
 	try {
-		if (global.client.channels.cache.get(channel_id)){
+		if (global.client.channels.cache.get(channel_id)) {
 			await global.client.channels.cache.get(channel_id).delete();
 		}
 		if (ask_to_join_vc[0].ask_to_join_vc) {
@@ -456,7 +456,7 @@ async function Cleanup() {
 			if (channel) {
 				// check if channel is empty
 				if (channel.members.size == 0) {
-				// delete channel
+					// delete channel
 					await deleteChannel(channel.id);
 				}
 			}
@@ -539,33 +539,33 @@ async function setUserCustomVCPermissions(newState, oldState) {
 
 async function createAskToJoin(linkedchannel) {
 	try {
-	// create an ask to join channel for the linked channel in the ask to join category
-	const guild = await global.client.guilds.cache.get(env.discord.guild);
-	const category = await guild.channels.cache.get(env.utilities.customvc.asktojoin);
-	const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
-	const channel = await guild.channels.create({
-		type: ChannelType.GuildVoice,
-		name: 'Ask to join ' + linkedchannelobj.name,
-		parent: category,
-		permissionOverwrites: [
-			{
-				id: guild.roles.everyone,
-				deny: [
-					PermissionFlagsBits.Connect,
-				],
-			},
-		],
-	});
-	const db = await mariadb.getConnection();
-	console.log('created ask to join channel for ' + linkedchannel);
-	await db.query('UPDATE custom_vc SET ask_to_join_vc = ? WHERE channel_id = ?', [channel.id, linkedchannel]);
-	db.end();
-	return channel;
-}
-catch (error) {
-	console.error(error);
-	embedcreator.sendError(error);
-}
+		// create an ask to join channel for the linked channel in the ask to join category
+		const guild = await global.client.guilds.cache.get(env.discord.guild);
+		const category = await guild.channels.cache.get(env.utilities.customvc.asktojoin);
+		const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
+		const channel = await guild.channels.create({
+			type: ChannelType.GuildVoice,
+			name: 'Ask to join ' + linkedchannelobj.name,
+			parent: category,
+			permissionOverwrites: [
+				{
+					id: guild.roles.everyone,
+					deny: [
+						PermissionFlagsBits.Connect,
+					],
+				},
+			],
+		});
+		const db = await mariadb.getConnection();
+		console.log('created ask to join channel for ' + linkedchannel);
+		await db.query('UPDATE custom_vc SET ask_to_join_vc = ? WHERE channel_id = ?', [channel.id, linkedchannel]);
+		db.end();
+		return channel;
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
 }
 async function deleteAskToJoin(linkedchannel) {
 	// delete the ask to join channel for the linked channel
@@ -584,7 +584,7 @@ async function deleteAskToJoin(linkedchannel) {
 	catch (error) {
 		console.error(error);
 		embedcreator.sendError(error);
-}
+	}
 }
 
 module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions };
