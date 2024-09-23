@@ -35,7 +35,24 @@ async function setBitrate() {
 		embedcreator.sendError(error);
 	}
 }
+async function getParentChannel(channelid) {
+	try {
+		const channel = await global.client.channels.cache.get(channelid);
+		if (channel.parentId) {
+			return channel.parentId;
+		}
+		else {
+			return null;
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+
 module.exports = {
 	getMaxBitrate,
 	setBitrate,
+	getParentChannel
 };
