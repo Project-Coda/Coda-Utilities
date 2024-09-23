@@ -21,14 +21,14 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please enter the new name' });
 		// message collector to collect new name
 		const filter = m => m.author.id === interaction.user.id;
-		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = await interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newname = await m.content;
 			const message = await m;
 			await collector.stop();
 			collector = false;
-			await renameChannel(userchannel, newname);
-			followup = await interaction.followUp({ content: 'Channel renamed to ' + newname });
+			const fullnewname = await renameChannel(userchannel, newname);
+			followup = await interaction.followUp({ content: 'Channel renamed to ' + fullnewname });
 			// delete reply after timout
 			setTimeout(async function () {
 				await followup.delete();
@@ -59,7 +59,7 @@ async function buttonResponder(interaction) {
 		interaction.reply({ content: 'Please enter the new user limit' });
 		// message collector to collect new user limit
 		const filter = m => m.author.id === interaction.user.id;
-		collector = interaction.channel.createMessageCollector({ filter, time: 600000 });
+		collector = await interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
 			const newlimit = await m.content;
 			const message = await m;
@@ -178,7 +178,9 @@ async function buttonResponder(interaction) {
 async function renameChannel(channelid, newname) {
 	try {
 		const channel = await global.client.channels.cache.get(channelid);
-		return await channel.setName(newname);
+		const fullnewname = '🔻' + newname;
+		await channel.setName(fullnewname);
+		return fullnewname;
 	}
 	catch (error) {
 		console.error(error);
@@ -189,7 +191,7 @@ async function renameChannel(channelid, newname) {
 async function changeVisibility(channelid) {
 	try {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
-		const channel = global.client.channels.cache.get(channelid);
+		const channel = await global.client.channels.cache.get(channelid);
 		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
 		if (haspermission) {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false, Connect: false });
@@ -275,11 +277,11 @@ async function checkUser(userid) {
 async function getChannels() {
 	db = await mariadb.getConnection();
 	rows = await db.query('SELECT channel_id FROM custom_vc');
-	channels = [];
-	for (row of rows) {
+	db.end();
+	const channels = [];
+	for (const row of rows) {
 		channels.push(row.channel_id);
 	}
-	db.end();
 	return channels;
 }
 // Delete Channel
@@ -298,7 +300,7 @@ async function deleteChannel(channel_id) {
 		if (global.client.channels.cache.get(channel_id)) {
 			await global.client.channels.cache.get(channel_id).delete();
 		}
-		if (ask_to_join_vc[0].ask_to_join_vc) {
+		if (ask_to_join_vc[0].ask_to_join_vc != null) {
 			await global.client.channels.cache.get(ask_to_join_vc[0].ask_to_join_vc).delete();
 		}
 	}
@@ -325,7 +327,7 @@ async function Create(newState) {
 	nickname = await userobject.displayName;
 	vc_bitrate = await getMaxBitrate();
 	const channel = await member.guild.channels.create({
-		name: nickname + '\'s Channel',
+		name: '🔻' + nickname + '\'s Channel',
 		type: ChannelType.GuildVoice,
 		bitrate: vc_bitrate,
 		parent: category,
@@ -465,6 +467,7 @@ async function Cleanup() {
 				await deleteChannel(channel_id);
 			}
 		}
+		return 'Custom VC cleanup complete';
 	}
 	catch (error) {
 		console.error(error);
@@ -543,15 +546,20 @@ async function createAskToJoin(linkedchannel) {
 		const guild = await global.client.guilds.cache.get(env.discord.guild);
 		const category = await guild.channels.cache.get(env.utilities.customvc.asktojoin);
 		const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
+		const strippedname = await linkedchannelobj.name.replace('🔻', '');
 		const channel = await guild.channels.create({
 			type: ChannelType.GuildVoice,
-			name: 'Ask to join ' + linkedchannelobj.name,
+			name: '🔻Ask to join ' + strippedname,
+			bitrate: linkedchannelobj.bitrate,
 			parent: category,
 			permissionOverwrites: [
 				{
 					id: guild.roles.everyone,
-					deny: [
+					allow: [
 						PermissionFlagsBits.Connect,
+					],
+					deny: [
+						PermissionFlagsBits.Speak,
 					],
 				},
 			],
@@ -586,5 +594,75 @@ async function deleteAskToJoin(linkedchannel) {
 		embedcreator.sendError(error);
 	}
 }
+async function askToJoinSendMessage(userid, linkedchannel) {
+	try {
+		const db = await mariadb.getConnection();
+		const rows = await db.query('SELECT channel_id from custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]);
+		// get user from userid
+		db.end();
+		if (rows[0].channel_id) {
+			const channel = await global.client.channels.cache.get(rows[0].channel_id);
+			const channel_owner = await db.query('SELECT user_id FROM custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]).then(rows => rows[0].user_id);
+			const guild = await global.client.guilds.cache.get(env.discord.guild);
+			const usertomove = await guild.members.fetch(userid);
+			const custom_vc = await db.query('SELECT channel_id FROM custom_vc WHERE user_id = ?', [channel_owner]).then(rows => rows[0].channel_id);
+			buttonyes = new ButtonBuilder()
+				.setCustomId('yes')
+				.setLabel('Yes')
+				.setStyle(ButtonStyle.Success)
+				.setEmoji('✅');
+			buttonno = new ButtonBuilder()
+				.setCustomId('no')
+				.setLabel('No')
+				.setStyle(ButtonStyle.Danger)
+				.setEmoji('❌');
+			message = await channel.send({
+				content: 'Hey <@' + channel_owner + '>, <@' + userid + '> would like to join your channel.\nClick the button below to allow them to join.',
+				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)]
+			});
+			// message collector
+			const filter = i => i.user.id === channel_owner;
+			const collector = message.createMessageComponentCollector({ filter, time: 3600000 });
+			collector.on('collect', async i => {
+				if (i.customId === 'yes') {
+					try {
+						await i.reply({ content: 'Moved user to channel', ephemeral: true });
+						await usertomove.voice.setChannel(custom_vc);
+						i.message.delete();
+					}
+					catch (error) {
+						console.error(error);
+						embedcreator.sendError(error);
+						i.followUp({ content: 'Error moving user to channel', ephemeral: true });
+					}
+				}
+				if (i.customId === 'no') {
+					try {
+						await i.reply({ content: 'User denied access to channel', ephemeral: true });
+						i.message.delete();
+						// kick user from channel
+						await usertomove.voice.setChannel(null);
+					}
+					catch (error) {
+						console.error(error);
+						embedcreator.sendError(error);
+						i.followUp({ content: 'Error denying user access to channel', ephemeral: true });
+					}
 
-module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions };
+					collector.on('end', async collected => {
+						if (collected.size === 0) {
+							message.delete();
+						}
+					});
+				}
+			}
+			)
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+
+module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage };
