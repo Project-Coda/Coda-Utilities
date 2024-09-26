@@ -50,7 +50,7 @@ global.client.once('ready', async () => {
 	await db.query('CREATE TABLE IF NOT EXISTS settings (setting VARCHAR(255) PRIMARY KEY, value BOOLEAN)');
 	// create custom vc table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS custom_vc (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255), ask_to_join_vc VARCHAR(255))');
-	await db.query('CREATE TABLE IF NOT EXISTS custom_vc_queue (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255), ask_to_join_vc VARCHAR(255), FOREIGN KEY (channel_id) REFERENCES custom_vc(channel_id) ON DELETE CASCADE) ');
+	await db.query('CREATE TABLE IF NOT EXISTS custom_vc_queue (user_id VARCHAR(255) PRIMARY KEY, channel_id VARCHAR(255), ask_to_join_vc VARCHAR(255), message_id VARCHAR(255), FOREIGN KEY (channel_id) REFERENCES custom_vc(channel_id) ON DELETE CASCADE)');
 	// create auto role table if it doesn't exist
 	await db.query('CREATE TABLE IF NOT EXISTS auto_role (role_id VARCHAR(255) PRIMARY KEY)');
 	// create coda strikes table if it doesn't exist

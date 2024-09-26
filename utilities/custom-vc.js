@@ -598,8 +598,15 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 	try {
 		const db = await mariadb.getConnection();
 		const rows = await db.query('SELECT channel_id from custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]);
-		// get user from userid
-		db.end();
+		if (!rows[0].channel_id) {
+			db.end();
+			return;
+		}
+		else {
+			const insert = await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, linked_channel) VALUES (?, ?, ?)', [userid, linkedchannel, rows[0].channel_id]);
+			// get user from userid
+			db.end();
+		}
 		if (rows[0].channel_id) {
 			const channel = await global.client.channels.cache.get(rows[0].channel_id);
 			const channel_owner = await db.query('SELECT user_id FROM custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]).then(rows => rows[0].user_id);
@@ -628,18 +635,19 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 					try {
 						await i.reply({ content: 'Moved user to channel', ephemeral: true });
 						await usertomove.voice.setChannel(custom_vc);
-						i.message.delete();
+						deleteAskToJoin(userid);
 					}
 					catch (error) {
 						console.error(error);
 						embedcreator.sendError(error);
 						i.followUp({ content: 'Error moving user to channel', ephemeral: true });
+						deleteAskToJoin(userid);
 					}
 				}
 				if (i.customId === 'no') {
 					try {
 						await i.reply({ content: 'User denied access to channel', ephemeral: true });
-						i.message.delete();
+						deleteAskToJoin(userid);
 						// kick user from channel
 						await usertomove.voice.setChannel(null);
 					}
@@ -663,6 +671,19 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 		console.error(error);
 		embedcreator.sendError(error);
 	}
+}
+
+async function deleteAskToJoin(user_id) {
+	try {
+		const db = await mariadb.getConnection();
+		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		db.end();
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+	
 }
 
 module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage };
