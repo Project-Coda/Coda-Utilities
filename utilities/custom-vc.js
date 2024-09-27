@@ -613,7 +613,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				.setCustomId('no')
 				.setLabel('No')
 				.setStyle(ButtonStyle.Danger)
-				.setEmoji('❌');
+				.setEmoji('✖️');
 			message = await channel.send({
 				content: 'Hey <@' + channel_owner + '>, <@' + userid + '> would like to join your channel.\nClick the button below to allow them to join.',
 				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)]
