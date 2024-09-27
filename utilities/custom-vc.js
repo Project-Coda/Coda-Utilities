@@ -598,15 +598,6 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 	try {
 		const db = await mariadb.getConnection();
 		const rows = await db.query('SELECT channel_id from custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]);
-		if (!rows[0].channel_id) {
-			db.end();
-			return;
-		}
-		else {
-			const insert = await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, linked_channel) VALUES (?, ?, ?)', [userid, linkedchannel, rows[0].channel_id]);
-			// get user from userid
-			db.end();
-		}
 		if (rows[0].channel_id) {
 			const channel = await global.client.channels.cache.get(rows[0].channel_id);
 			const channel_owner = await db.query('SELECT user_id FROM custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]).then(rows => rows[0].user_id);
@@ -627,6 +618,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				content: 'Hey <@' + channel_owner + '>, <@' + userid + '> would like to join your channel.\nClick the button below to allow them to join.',
 				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)]
 			});
+			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc,  userid, linkedchannel, message.id]);
 			// message collector
 			const filter = i => i.user.id === channel_owner;
 			const collector = message.createMessageComponentCollector({ filter, time: 3600000 });
@@ -676,7 +668,14 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 async function deleteAskToJoin(user_id) {
 	try {
 		const db = await mariadb.getConnection();
+		// get message id
+		const message_id = await db.query('SELECT message_id, channel_id FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		// delete from db
 		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		// delete message
+		const channel = await global.client.channels.cache.get(message_id[0].channel_id);
+		const message = await channel.messages.fetch(message_id[0].message_id);
+		await message.delete();
 		db.end();
 	}
 	catch (error) {
