@@ -254,25 +254,25 @@ global.client.on('messageReactionRemove', async (reaction, user) => {
 
 global.client.on('voiceStateUpdate', async (oldState, newState) => {
 	try {
-	await CustomVC.Cleanup(oldState);
-	// ensure channel still exists
-	newUserChannel = await newState.channelId;
-	if (!newUserChannel) return;
-	oldUserChannel = await oldState.channelId;
-	userid = await newState.member.id;
-	// get parent category of newState channel
-	const createcustomvc = env.utilities.customvc.channel;
-	const asktojoin_category = env.utilities.customvc.asktojoin;
-	const parent = await vctools.getParentChannel(newUserChannel);
-	if (newUserChannel === createcustomvc) {
-		CustomVC.Create(newState);
-	}
-	if (parent === asktojoin_category) {
-		console.log('User joined an ask to join channel.');
-		CustomVC.askToJoinSendMessage(userid, newUserChannel);
-	}
-	await vctools.setBitrate();
-	await CustomVC.setUserCustomVCPermissions(newState, oldState);
+		await CustomVC.Cleanup(oldState);
+		// ensure channel still exists
+		newUserChannel = await newState.channelId;
+		if (!newUserChannel) return;
+		oldUserChannel = await oldState.channelId;
+		userid = await newState.member.id;
+		// get parent category of newState channel
+		const createcustomvc = env.utilities.customvc.channel;
+		const asktojoin_category = env.utilities.customvc.asktojoin;
+		const parent = await vctools.getParentChannel(newUserChannel);
+		if (newUserChannel === createcustomvc) {
+			CustomVC.Create(newState);
+		}
+		if (parent === asktojoin_category) {
+			console.log('User joined an ask to join channel.');
+			CustomVC.askToJoinSendMessage(userid, newUserChannel);
+		}
+		await vctools.setBitrate();
+		await CustomVC.setUserCustomVCPermissions(newState, oldState);
 	}
 	catch (error) {
 		console.error(error);
