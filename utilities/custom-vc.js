@@ -23,8 +23,8 @@ async function buttonResponder(interaction) {
 		const filter = m => m.author.id === interaction.user.id;
 		collector = await interaction.channel.createMessageCollector({ filter, time: 600000 });
 		collector.on('collect', async m => {
-			const newname = await m.content;
 			const message = await m;
+			const newname = await m.content;
 			await collector.stop();
 			collector = false;
 			const fullnewname = await renameChannel(userchannel, newname);
@@ -180,6 +180,13 @@ async function renameChannel(channelid, newname) {
 		const channel = await global.client.channels.cache.get(channelid);
 		const fullnewname = '🔻' + newname;
 		await channel.setName(fullnewname);
+		const db = await mariadb.getConnection();
+		const ask_to_join_channel = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channelid]).then(rows => rows[0].ask_to_join_vc);
+		db.end();
+		if (ask_to_join_channel) {
+			const ask_to_join_channel_obj = await global.client.channels.cache.get(ask_to_join_channel);
+			await ask_to_join_channel_obj.setName('🔻Ask to join' + fullnewname);
+		}
 		return fullnewname;
 	}
 	catch (error) {
@@ -192,14 +199,14 @@ async function changeVisibility(channelid) {
 	try {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = await global.client.channels.cache.get(channelid);
-		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
+		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
 		if (haspermission) {
-			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false, Connect: false });
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: false });
 			await createAskToJoin(channelid);
 			return 'hidden';
 		}
 		else {
-			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true, Connect: true });
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: true });
 			// change button to visible
 			await deleteAskToJoinChannel(channelid);
 			return 'visible';
@@ -395,7 +402,7 @@ async function generateMenuEmbed(channelid) {
 	const channel = await global.client.channels.cache.get(channelid);
 	const guild = await global.client.guilds.cache.get(env.discord.guild);
 	// check if channel is visible
-	const visible = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
+	const visible = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
 	if (visible) {
 		visibilitystatus = 'Visible';
 		visibilitybutton = ButtonStyle.Success;
@@ -672,12 +679,12 @@ async function deleteAskToJoin(user_id) {
 		const message_id = await db.query('SELECT message_id, channel_id FROM custom_vc_queue WHERE user_id = ?', [user_id]);
 		// delete from db
 		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		db.end();
 		console.log(message_id);
 		// delete message
 		const channel = await global.client.channels.cache.get(message_id[0].channel_id);
 		const message = await channel.messages.fetch(message_id[0].message_id);
 		await message.delete();
-		db.end();
 	}
 	catch (error) {
 		console.error(error);
