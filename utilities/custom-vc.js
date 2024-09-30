@@ -30,7 +30,7 @@ async function buttonResponder(interaction) {
 			const fullnewname = await renameChannel(userchannel, newname);
 			followup = await interaction.followUp({ content: 'Channel renamed to ' + fullnewname });
 			// delete reply after timout
-			setTimeout(async function () {
+			setTimeout(async function() {
 				await followup.delete();
 				const reply = await interaction.fetchReply();
 				await reply.delete();
@@ -47,7 +47,7 @@ async function buttonResponder(interaction) {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -69,7 +69,7 @@ async function buttonResponder(interaction) {
 				await changeUserLimit(userchannel, newlimit);
 				followup = await interaction.followUp({ content: 'User limit changed to ' + newlimit });
 				// delete reply after timout
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -85,21 +85,21 @@ async function buttonResponder(interaction) {
 			else {
 				followup = await interaction.followUp({ content: 'Invalid user limit' });
 				// delete followUp after timout
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
 					// delete user message
 					await message.delete();
 				}
-					, 1000);
+				, 1000);
 			}
 		});
 		collector.on('end', async collected => {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -121,7 +121,7 @@ async function buttonResponder(interaction) {
 				await transferOwnership(userid, newowner.user.id, userchannel);
 				followup = await interaction.followUp({ content: 'Ownership transferred to <@' + newowner.user + '>' });
 				// delete reply after timout
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -137,21 +137,21 @@ async function buttonResponder(interaction) {
 			else {
 				followup = await interaction.followUp({ content: 'Invalid user' });
 				// delete followUp after timout
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await followup.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
 					// delete user message
 					await message.delete();
 				}
-					, 1000);
+				, 1000);
 			}
 		});
 		collector.on('end', async collected => {
 			if (collected.size === 0) {
 				timeout = await interaction.followUp({ content: 'Timed out' });
 				// cleanup timeout message
-				setTimeout(async function () {
+				setTimeout(async function() {
 					await timeout.delete();
 					const reply = await interaction.fetchReply();
 					await reply.delete();
@@ -163,7 +163,7 @@ async function buttonResponder(interaction) {
 		const status = await changeVisibility(userchannel);
 		await interaction.reply({ content: 'Visibility changed to ' + status });
 		// delete reply after timout
-		setTimeout(async function () {
+		setTimeout(async function() {
 			const reply = await interaction.fetchReply();
 			await reply.delete();
 		}, 1000);
@@ -201,7 +201,7 @@ async function changeVisibility(channelid) {
 		else {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true, Connect: true });
 			// change button to visible
-			await deleteAskToJoin(channelid);
+			await deleteAskToJoinChannel(channelid);
 			return 'visible';
 		}
 	}
@@ -575,7 +575,7 @@ async function createAskToJoin(linkedchannel) {
 		embedcreator.sendError(error);
 	}
 }
-async function deleteAskToJoin(linkedchannel) {
+async function deleteAskToJoinChannel(linkedchannel) {
 	// delete the ask to join channel for the linked channel
 	const db = await mariadb.getConnection();
 	const rows = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [linkedchannel]);
@@ -585,8 +585,8 @@ async function deleteAskToJoin(linkedchannel) {
 			const channel = await global.client.channels.cache.get(rows[0].ask_to_join_vc);
 			await channel.delete();
 		}
-		const db = await mariadb.getConnection();
-		await db.query('UPDATE custom_vc SET ask_to_join_vc = NULL WHERE channel_id = ?', [linkedchannel]);
+		const db2 = await mariadb.getConnection();
+		await db2.query('UPDATE custom_vc SET ask_to_join_vc = NULL WHERE channel_id = ?', [linkedchannel]);
 		db.end();
 	}
 	catch (error) {
@@ -600,10 +600,10 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 		const rows = await db.query('SELECT channel_id from custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]);
 		if (rows[0].channel_id) {
 			const channel = await global.client.channels.cache.get(rows[0].channel_id);
-			const channel_owner = await db.query('SELECT user_id FROM custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]).then(rows => rows[0].user_id);
+			const channel_owner = await db.query('SELECT user_id FROM custom_vc WHERE ask_to_join_vc = ?', [linkedchannel]).then(rowsuid => rowsuid[0].user_id);
 			const guild = await global.client.guilds.cache.get(env.discord.guild);
 			const usertomove = await guild.members.fetch(userid);
-			const custom_vc = await db.query('SELECT channel_id FROM custom_vc WHERE user_id = ?', [channel_owner]).then(rows => rows[0].channel_id);
+			const custom_vc = await db.query('SELECT channel_id FROM custom_vc WHERE user_id = ?', [channel_owner]).then(rowscid => rowscid[0].channel_id);
 			buttonyes = new ButtonBuilder()
 				.setCustomId('yes')
 				.setLabel('Yes')
@@ -616,9 +616,9 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				.setEmoji('✖️');
 			message = await channel.send({
 				content: 'Hey <@' + channel_owner + '>, <@' + userid + '> would like to join your channel.\nClick the button below to allow them to join.',
-				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)]
+				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)],
 			});
-			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc,  userid, linkedchannel, message.id]);
+			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc, userid, linkedchannel, message.id]);
 			// message collector
 			const filter = i => i.user.id === channel_owner;
 			const collector = await message.createMessageComponentCollector({ filter, time: 3600000 });
@@ -655,8 +655,8 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 						}
 					});
 				}
-			}
-			)
+			},
+			);
 		}
 	}
 	catch (error) {
@@ -672,6 +672,7 @@ async function deleteAskToJoin(user_id) {
 		const message_id = await db.query('SELECT message_id, channel_id FROM custom_vc_queue WHERE user_id = ?', [user_id]);
 		// delete from db
 		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		console.log(message_id);
 		// delete message
 		const channel = await global.client.channels.cache.get(message_id[0].channel_id);
 		const message = await channel.messages.fetch(message_id[0].message_id);
@@ -682,7 +683,7 @@ async function deleteAskToJoin(user_id) {
 		console.error(error);
 		embedcreator.sendError(error);
 	}
-	
+
 }
 
-module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage };
+module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage, deleteAskToJoinChannel };
