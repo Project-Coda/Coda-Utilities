@@ -608,7 +608,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				.setCustomId('yes')
 				.setLabel('Yes')
 				.setStyle(ButtonStyle.Success)
-				.setEmoji('✅');
+				.setEmoji('✔️');
 			buttonno = new ButtonBuilder()
 				.setCustomId('no')
 				.setLabel('No')
@@ -621,7 +621,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc,  userid, linkedchannel, message.id]);
 			// message collector
 			const filter = i => i.user.id === channel_owner;
-			const collector = message.createMessageComponentCollector({ filter, time: 3600000 });
+			const collector = await message.createMessageComponentCollector({ filter, time: 3600000 });
 			collector.on('collect', async i => {
 				if (i.customId === 'yes') {
 					try {
