@@ -173,6 +173,33 @@ async function buttonResponder(interaction) {
 		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 		await oldembed.delete();
 	}
+	if (buttonid === 'toggle_lock') {
+		const status = await toggleChannelLock(userchannel);
+		await interaction.reply({ content: 'Channel ' + status });
+		// delete reply after timout
+		setTimeout(async function() {
+			const reply = await interaction.fetchReply();
+			await reply.delete();
+		}, 1000);
+		const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+		await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
+		// cleanup old embed
+		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+		await oldembed.delete();
+	}
+	if (buttonid === 'hide_ask_to_join') {
+		db3 = await mariadb.getConnection();
+		const ask_to_join_vc = await db3.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [userchannel]).then(rows => rows[0].ask_to_join_vc);
+		db3.end();
+		if (ask_to_join_vc) {
+			await deleteAskToJoinChannel(userchannel);
+			await interaction.reply({ content: 'Ask to join disabled' });
+		}
+		else {
+			await createAskToJoin(userchannel);
+			await interaction.reply({ content: 'Ask to join enabled' });
+		}
+	}
 }
 // Rename Channel
 async function renameChannel(channelid, newname) {
