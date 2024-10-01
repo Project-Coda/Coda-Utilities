@@ -37,8 +37,8 @@ async function buttonResponder(interaction) {
 				// delete user message
 				await message.delete();
 			}, 1000);
-			const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-			await interaction.followUp({ content: content, embeds: [embed], components: [row] });
+			const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+			await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
 			// cleanup old embed
 			const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 			await oldembed.delete();
@@ -76,8 +76,8 @@ async function buttonResponder(interaction) {
 					// delete user message
 					await message.delete();
 				}, 1000);
-				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+				await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
 				// cleanup old embed
 				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 				await oldembed.delete();
@@ -128,8 +128,8 @@ async function buttonResponder(interaction) {
 					// delete user message
 					await message.delete();
 				}, 1000);
-				const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-				await interaction.followUp({ content: content, embeds: [embed], components: [row] });
+				const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+				await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
 				// cleanup old embed
 				const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 				await oldembed.delete();
@@ -167,8 +167,8 @@ async function buttonResponder(interaction) {
 			const reply = await interaction.fetchReply();
 			await reply.delete();
 		}, 1000);
-		const { content, embed, row } = await generateMenuEmbed(interaction.channel.id);
-		await interaction.followUp({ content: content, embeds: [embed], components: [row] });
+		const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+		await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
 		// cleanup old embed
 		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
 		await oldembed.delete();
@@ -199,17 +199,38 @@ async function changeVisibility(channelid) {
 	try {
 		guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = await global.client.channels.cache.get(channelid);
-		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
+		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
 		if (haspermission) {
-			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: false });
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: false });
 			await createAskToJoin(channelid);
 			return 'hidden';
 		}
 		else {
-			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: true });
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { ViewChannel: true });
 			// change button to visible
 			await deleteAskToJoinChannel(channelid);
 			return 'visible';
+		}
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+}
+
+async function toggleChannelLock(channelid) {
+	try {
+		const channel = await global.client.channels.cache.get(channelid);
+		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
+		if (haspermission) {
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: false });
+			createAskToJoin(channelid);
+			return 'locked';
+		}
+		else {
+			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: true });
+			deleteAskToJoinChannel(channelid);
+			return 'unlocked';
 		}
 	}
 	catch (error) {
@@ -383,8 +404,8 @@ async function Create(newState) {
 	}
 	try {
 		// send menu embed
-		const { content, embed, row } = await generateMenuEmbed(channel.id);
-		await channel.send({ content: content, embeds: [embed], components: [row] });
+		const { content, embed, row, row2 } = await generateMenuEmbed(channel.id);
+		await channel.send({ content: content, embeds: [embed], components: [row, row2] });
 	}
 	catch (error) {
 		console.error(error);
@@ -402,7 +423,7 @@ async function generateMenuEmbed(channelid) {
 	const channel = await global.client.channels.cache.get(channelid);
 	const guild = await global.client.guilds.cache.get(env.discord.guild);
 	// check if channel is visible
-	const visible = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
+	const visible = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.ViewChannel);
 	if (visible) {
 		visibilitystatus = 'Visible';
 		visibilitybutton = ButtonStyle.Success;
@@ -411,6 +432,42 @@ async function generateMenuEmbed(channelid) {
 		visibilitystatus = 'Hidden';
 		visibilitybutton = ButtonStyle.Danger;
 	}
+	const lockstatus = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
+	if (!lockstatus) {
+		lockstatuslabel = 'Unlock channel';
+		lockstatusemoji = '🔓';
+		lockstatusbutton = ButtonStyle.Danger;
+		if (visible) {
+			lockstatusdisabled = false;
+		}
+		else {
+			lockstatusdisabled = true;
+		}
+	}
+	else {
+		lockstatuslabel = 'Lock channel';
+		lockstatusemoji = '🔒';
+		lockstatusbutton = ButtonStyle.Success;
+		if (visible) {
+			lockstatusdisabled = false;
+		}
+		else {
+			lockstatusdisabled = true;
+		}
+	}
+	// check if ask to join is enabled
+	const ask_to_join_vc = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channelid]).then(rowsatj => rowsatj[0].ask_to_join_vc);
+	if (ask_to_join_vc != null) {
+		asktojoinstatus = 'Disable ask to join';
+		asktojoinstatusemoji = '🔇';
+		asktojoinstatusbutton = ButtonStyle.Danger;
+	}
+	else {
+		asktojoinstatus = 'Enable ask to join';
+		asktojoinstatusemoji = '🗣️';
+		asktojoinstatusbutton = ButtonStyle.Success;
+	}
+
 	const embed = await embedcreator.setembed(
 		{
 			title: 'Custom voice channel menu',
@@ -449,9 +506,29 @@ async function generateMenuEmbed(channelid) {
 		.setLabel('Rename channel')
 		.setEmoji('📝')
 		.setStyle(ButtonStyle.Primary);
-	const row = new ActionRowBuilder()
-		.addComponents(renamechannel, userlimit, visibility, transferownership, deletechannel);
-	return { content, embed, row };
+
+	const hide_ask_to_join = new ButtonBuilder()
+		.setCustomId('hide_ask_to_join')
+		.setLabel(asktojoinstatus)
+		.setEmoji(asktojoinstatusemoji)
+		.setStyle(asktojoinstatusbutton);
+
+	const toggle_lock = new ButtonBuilder()
+		.setCustomId('toggle_lock')
+		.setLabel(lockstatuslabel)
+		.setEmoji(lockstatusemoji)
+		.setStyle(lockstatusbutton)
+		.setDisabled(lockstatusdisabled);
+
+	 const row = new ActionRowBuilder()
+		.addComponents(visibility, toggle_lock);
+	const row2 = new ActionRowBuilder()
+		.addComponents(renamechannel, userlimit, transferownership, deletechannel);
+	if (ask_to_join_vc != null) {
+		row2.addComponents(hide_ask_to_join);
+	}
+	return { content, embed, row, row2 };
+
 }
 // Destroy CustomVC
 async function Cleanup() {
@@ -549,6 +626,13 @@ async function setUserCustomVCPermissions(newState, oldState) {
 
 async function createAskToJoin(linkedchannel) {
 	try {
+		// ensure ask to join channel doesn't already exist
+		const dbcheck = await mariadb.getConnection();
+		const rows = await dbcheck.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [linkedchannel]);
+		dbcheck.end();
+		if (rows[0].ask_to_join_vc) {
+			return;
+		}
 		// create an ask to join channel for the linked channel in the ask to join category
 		const guild = await global.client.guilds.cache.get(env.discord.guild);
 		const category = await guild.channels.cache.get(env.utilities.customvc.asktojoin);
