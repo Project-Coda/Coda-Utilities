@@ -260,6 +260,7 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		if (!newUserChannel) return;
 		oldUserChannel = await oldState.channelId;
 		userid = await newState.member.id;
+		await CustomVC.cleanupAskToJoinMessage(oldUserChannel, newUserChannel, userid);
 		// get parent category of newState channel
 		const createcustomvc = env.utilities.customvc.channel;
 		const asktojoin_category = env.utilities.customvc.asktojoin;

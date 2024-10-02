@@ -817,5 +817,24 @@ async function deleteAskToJoin(user_id) {
 	}
 
 }
+async function cleanupAskToJoinMessage(oldStateID, newStateID, user_id) {
+	// delete message if user leaves ask to join channel
+	const db = await mariadb.getConnection();
+	const rows = await db.query('SELECT message_id, channel_id, ask_to_join_vc FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+	db.end();
+	if (rows.length === 0) {
+		console.log('no message to delete');
+		return;
+	}
+	// check to make sure new channel is not the channel the user is asking to join before deleting message o
+	if (oldStateID === rows[0].ask_to_join_vc && newStateID !== rows[0].channel_id) {
+		const channel = await global.client.channels.cache.get(rows[0].channel_id);
+		const message = await channel.messages.fetch(rows[0].message_id);
+		await message.delete();
+		const db2 = await mariadb.getConnection();
+		await db2.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		db2.end();
+	}
+}
 
-module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage, deleteAskToJoinChannel };
+module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage, deleteAskToJoinChannel, cleanupAskToJoinMessage };
