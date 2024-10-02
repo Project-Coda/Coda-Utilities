@@ -199,6 +199,16 @@ async function buttonResponder(interaction) {
 			await createAskToJoin(userchannel);
 			await interaction.reply({ content: 'Ask to join enabled' });
 		}
+
+		setTimeout(async function() {
+			const reply = await interaction.fetchReply();
+			await reply.delete();
+		}, 1000);
+		const { content, embed, row, row2 } = await generateMenuEmbed(interaction.channel.id);
+		await interaction.followUp({ content: content, embeds: [embed], components: [row, row2] });
+		// cleanup old embed
+		const oldembed = await interaction.channel.messages.fetch(interaction.message.id);
+		await oldembed.delete();
 	}
 }
 // Rename Channel
@@ -247,16 +257,17 @@ async function changeVisibility(channelid) {
 
 async function toggleChannelLock(channelid) {
 	try {
+		const guild = await global.client.guilds.cache.get(env.discord.guild);
 		const channel = await global.client.channels.cache.get(channelid);
 		const haspermission = await channel.permissionsFor(guild.roles.everyone).has(PermissionFlagsBits.Connect);
 		if (haspermission) {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: false });
-			createAskToJoin(channelid);
+			await createAskToJoin(channelid);
 			return 'locked';
 		}
 		else {
 			await channel.permissionOverwrites.edit(guild.roles.everyone.id, { Connect: true });
-			deleteAskToJoinChannel(channelid);
+			await deleteAskToJoinChannel(channelid);
 			return 'unlocked';
 		}
 	}
@@ -406,11 +417,13 @@ async function Create(newState) {
 				id: newState.guild.roles.everyone,
 				allow: [
 					PermissionFlagsBits.ViewChannel,
-					PermissionFlagsBits.Connect,
 					PermissionFlagsBits.Stream,
 					PermissionFlagsBits.ReadMessageHistory,
 					PermissionFlagsBits.SendMessages,
 					PermissionFlagsBits.Speak,
+				],
+				deny: [
+					PermissionFlagsBits.Connect,
 				],
 			},
 		],
@@ -430,6 +443,7 @@ async function Create(newState) {
 		embedcreator.sendError(error);
 	}
 	try {
+		await createAskToJoin(channel.id);
 		// send menu embed
 		const { content, embed, row, row2 } = await generateMenuEmbed(channel.id);
 		await channel.send({ content: content, embeds: [embed], components: [row, row2] });
@@ -484,7 +498,7 @@ async function generateMenuEmbed(channelid) {
 	}
 	// check if ask to join is enabled
 	const ask_to_join_vc = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channelid]).then(rowsatj => rowsatj[0].ask_to_join_vc);
-	if (ask_to_join_vc != null) {
+	if (ask_to_join_vc) {
 		asktojoinstatus = 'Disable ask to join';
 		asktojoinstatusemoji = '🔇';
 		asktojoinstatusbutton = ButtonStyle.Danger;
@@ -547,11 +561,11 @@ async function generateMenuEmbed(channelid) {
 		.setStyle(lockstatusbutton)
 		.setDisabled(lockstatusdisabled);
 
-	 const row = new ActionRowBuilder()
+	const row = new ActionRowBuilder()
 		.addComponents(visibility, toggle_lock);
 	const row2 = new ActionRowBuilder()
 		.addComponents(renamechannel, userlimit, transferownership, deletechannel);
-	if (ask_to_join_vc != null) {
+	if (ask_to_join_vc || !visible || !lockstatus) {
 		row2.addComponents(hide_ask_to_join);
 	}
 	return { content, embed, row, row2 };
