@@ -10,23 +10,11 @@ async function updateChannel(userid, oldchannel, newchannel) {
 		previous_channel = VALUES(previous_channel),
 		new_channel = VALUES(new_channel)`;
 		await db.query(sql, [userid, oldchannel, newchannel]);
+		await db.end();
 	}
 	catch (err) {
 		console.error(err);
 		embedcreator.sendError(err);
-	}
-	finally {
-		if (db) {
-			db.end()
-				.then(() => console.log('Database connection ended'))
-				.catch((err) => {
-					if (err) {
-						console.error(err);
-						embedcreator.sendError(err);
-					}
-				},
-				);
-		}
 	}
 }
 module.exports = {

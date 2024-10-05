@@ -219,7 +219,7 @@ async function renameChannel(channelid, newname) {
 		await channel.setName(fullnewname);
 		const db = await mariadb.getConnection();
 		const ask_to_join_channel = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channelid]).then(rows => rows[0].ask_to_join_vc);
-		db.end();
+		await db.end();
 		if (ask_to_join_channel) {
 			const ask_to_join_channel_obj = await global.client.channels.cache.get(ask_to_join_channel);
 			await ask_to_join_channel_obj.setName('🔻Ask to join' + fullnewname);
@@ -320,7 +320,7 @@ async function transferOwnership(olduser, newuser, channelid) {
 	try {
 		const db = await mariadb.getConnection();
 		await db.query('UPDATE custom_vc SET user_id = ? WHERE channel_id = ?', [newuser, channelid]);
-		db.end();
+		await db.end();
 	}
 	catch (error) {
 		console.error(error);
@@ -331,7 +331,7 @@ async function transferOwnership(olduser, newuser, channelid) {
 async function checkUser(userid) {
 	const db = await mariadb.getConnection();
 	const rows = await db.query('SELECT channel_id FROM custom_vc WHERE user_id = ?', [userid]);
-	db.end();
+	await db.end();
 	if (rows.length > 0) {
 		return rows[0].channel_id;
 	}
@@ -342,8 +342,8 @@ async function checkUser(userid) {
 // Get Channels from DB
 async function getChannels() {
 	db = await mariadb.getConnection();
-	rows = await db.query('SELECT channel_id FROM custom_vc');
-	db.end();
+	const rows = await db.query('SELECT channel_id FROM custom_vc');
+	await db.end();
 	const channels = [];
 	for (const row of rows) {
 		channels.push(row.channel_id);
@@ -356,7 +356,7 @@ async function deleteChannel(channel_id) {
 		const db = await mariadb.getConnection();
 		ask_to_join_vc = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [channel_id]);
 		await db.query('DELETE FROM custom_vc WHERE channel_id = ?', [channel_id]);
-		db.end();
+		await db.end();
 	}
 	catch (error) {
 		console.error(error);
@@ -458,7 +458,7 @@ async function generateMenuEmbed(channelid) {
 	// get owner
 	const db = await mariadb.getConnection();
 	const rows = await db.query('SELECT user_id FROM custom_vc WHERE channel_id = ?', [channelid]);
-	db.end();
+	await db.end();
 	const owner = rows[0].user_id;
 	const content = 'Welcome <@' + owner + '> to your custom voice channel.';
 	const channel = await global.client.channels.cache.get(channelid);
@@ -670,7 +670,7 @@ async function createAskToJoin(linkedchannel) {
 		// ensure ask to join channel doesn't already exist
 		const dbcheck = await mariadb.getConnection();
 		const rows = await dbcheck.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [linkedchannel]);
-		dbcheck.end();
+		await dbcheck.end();
 		if (rows[0].ask_to_join_vc) {
 			return;
 		}
@@ -697,9 +697,8 @@ async function createAskToJoin(linkedchannel) {
 			],
 		});
 		const db = await mariadb.getConnection();
-		console.log('created ask to join channel for ' + linkedchannel);
 		await db.query('UPDATE custom_vc SET ask_to_join_vc = ? WHERE channel_id = ?', [channel.id, linkedchannel]);
-		db.end();
+		await db.end();
 		return channel;
 	}
 	catch (error) {
@@ -711,7 +710,7 @@ async function deleteAskToJoinChannel(linkedchannel) {
 	// delete the ask to join channel for the linked channel
 	const db = await mariadb.getConnection();
 	const rows = await db.query('SELECT ask_to_join_vc FROM custom_vc WHERE channel_id = ?', [linkedchannel]);
-	db.end();
+	await db.end();
 	try {
 		if (rows[0].ask_to_join_vc) {
 			const channel = await global.client.channels.cache.get(rows[0].ask_to_join_vc);
@@ -719,7 +718,7 @@ async function deleteAskToJoinChannel(linkedchannel) {
 		}
 		const db2 = await mariadb.getConnection();
 		await db2.query('UPDATE custom_vc SET ask_to_join_vc = NULL WHERE channel_id = ?', [linkedchannel]);
-		db.end();
+		await db.end();
 	}
 	catch (error) {
 		console.error(error);
@@ -751,6 +750,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)],
 			});
 			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc, userid, linkedchannel, message.id]);
+			db.end();
 			// message collector
 			const filter = i => i.user.id === channel_owner;
 			const collector = await message.createMessageComponentCollector({ filter, time: 3600000 });
@@ -804,7 +804,7 @@ async function deleteAskToJoin(user_id) {
 		const message_id = await db.query('SELECT message_id, channel_id FROM custom_vc_queue WHERE user_id = ?', [user_id]);
 		// delete from db
 		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
-		db.end();
+		await db.end();
 		console.log(message_id);
 		// delete message
 		const channel = await global.client.channels.cache.get(message_id[0].channel_id);
@@ -821,9 +821,8 @@ async function cleanupAskToJoinMessage(oldStateID, newStateID, user_id) {
 	// delete message if user leaves ask to join channel
 	const db = await mariadb.getConnection();
 	const rows = await db.query('SELECT message_id, channel_id, ask_to_join_vc FROM custom_vc_queue WHERE user_id = ?', [user_id]);
-	db.end();
+	await db.end();
 	if (rows.length === 0) {
-		console.log('no message to delete');
 		return;
 	}
 	// check if user leaves ask to join channel
@@ -833,7 +832,7 @@ async function cleanupAskToJoinMessage(oldStateID, newStateID, user_id) {
 		await message.delete();
 		const db2 = await mariadb.getConnection();
 		await db2.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
-		db2.end();
+		await db2.end();
 	}
 }
 

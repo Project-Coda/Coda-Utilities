@@ -57,7 +57,7 @@ global.client.once('ready', async () => {
 	// create coda strikes table if it doesn't exist
 	// await db.query('DROP TABLE IF EXISTS coda_strikes');
 	await db.query('CREATE TABLE IF NOT EXISTS coda_strikes (user_id VARCHAR(255) PRIMARY KEY, strikes INT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
-	await db.query('CREATE TABLE IF NOT EXISTS vc_logs (user_id VARCHAR(255), previous_channel VARCHAR(255), new_channel VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
+	await db.query('CREATE TABLE IF NOT EXISTS vc_logs (user_id VARCHAR(255) PRIMARY KEY, previous_channel VARCHAR(255), new_channel VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
 	db.end();
 }
 )();
