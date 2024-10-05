@@ -751,35 +751,63 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 				components: [new ActionRowBuilder().addComponents(buttonyes, buttonno)],
 			});
 			await db.query('INSERT INTO custom_vc_queue (channel_id, user_id, ask_to_join_vc, message_id) VALUES (?, ?, ?, ?)', [custom_vc, userid, linkedchannel, message.id]);
-			db.end();
+			await db.end();
+			// get linked channel
+			const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
 			// message collector
 			const filter = i => i.user.id === channel_owner;
 			const collector = await message.createMessageComponentCollector({ filter, time: 3600000 });
 			collector.on('collect', async i => {
 				if (i.customId === 'yes') {
 					try {
-						await i.reply({ content: 'Moved user to channel', ephemeral: true });
+						await i.reply({ content: 'Moved user to channel' }).then(msg => {
+							setTimeout(function() {
+								msg.delete();
+							}, 1000);
+						},
+						);
 						await usertomove.voice.setChannel(custom_vc);
-						deleteAskToJoin(userid);
+						await deleteAskToJoin(userid);
 					}
 					catch (error) {
 						console.error(error);
 						embedcreator.sendError(error);
-						i.followUp({ content: 'Error moving user to channel', ephemeral: true });
-						deleteAskToJoin(userid);
+						await i.followUp({ content: 'Error moving user to channel' }).then(msg => {
+							setTimeout(function() {
+								msg.delete();
+							}, 1000);
+						},
+						);
+						await deleteAskToJoin(userid);
 					}
 				}
 				if (i.customId === 'no') {
 					try {
-						await i.reply({ content: 'User denied access to channel', ephemeral: true });
-						deleteAskToJoin(userid);
-						// kick user from channel
-						await vctools.returnUserToPreviousChannel(userid);
+						await i.reply({ content: 'User denied access to channel' }).then(msg => {
+							setTimeout(function() {
+								msg.delete();
+							}, 1000);
+						},
+						);
+						await deleteAskToJoin(userid);
+						// before kicking user from channel, send them a message in the vc channel
+						linkedchannelobj.send({ content: '<@' + userid + '> you have been denied access to the VC... you will be moved back to your previous channel in 5 seconds' }).then(msg => {
+							setTimeout(async function() {
+								// kick user from channel
+								await vctools.returnUserToPreviousChannel(userid);
+								msg.delete();
+							}, 5000);
+						});
 					}
 					catch (error) {
 						console.error(error);
 						embedcreator.sendError(error);
-						i.followUp({ content: 'Error denying user access to channel', ephemeral: true });
+						i.followUp({ content: 'Error denying user access to channel' }).then(msg => {
+							setTimeout(function() {
+								msg.delete();
+							}, 1000);
+						},
+						);
 					}
 
 					collector.on('end', async collected => {
