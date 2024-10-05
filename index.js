@@ -15,6 +15,7 @@ const autorole = require('./utilities/autorole.js');
 const vctools = require('./utilities/vc-tools.js');
 const { checkMention } = require('./utilities/message-filter.js');
 const nodecron = require('node-cron');
+const vclogs = require('./utilities/vc-logs.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -38,7 +39,7 @@ global.client.once('ready', async () => {
 });
 
 (async () => {
-	db = await mariadb.getConnection();
+	const db = await mariadb.getConnection();
 	// drop table if it exists
 	// only for testing
 	// await db.query('DROP TABLE IF EXISTS custom_vc');
@@ -56,6 +57,7 @@ global.client.once('ready', async () => {
 	// create coda strikes table if it doesn't exist
 	// await db.query('DROP TABLE IF EXISTS coda_strikes');
 	await db.query('CREATE TABLE IF NOT EXISTS coda_strikes (user_id VARCHAR(255) PRIMARY KEY, strikes INT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
+	await db.query('CREATE TABLE IF NOT EXISTS vc_logs (user_id VARCHAR(255), previous_channel VARCHAR(255), new_channel VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
 	db.end();
 }
 )();
@@ -175,7 +177,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 	console.log(emoji);
 	// query db for role
 	try {
-		db = await mariadb.getConnection();
+		const db = await mariadb.getConnection();
 		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 		db.end();
 		const roleId = String(role[0].id);
@@ -260,6 +262,7 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		if (!newUserChannel) return;
 		oldUserChannel = await oldState.channelId;
 		userid = await newState.member.id;
+		await vclogs.updateChannel(userid, oldUserChannel, newUserChannel);
 		await CustomVC.cleanupAskToJoinMessage(oldUserChannel, newUserChannel, userid);
 		// get parent category of newState channel
 		const createcustomvc = env.utilities.customvc.channel;
