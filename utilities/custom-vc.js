@@ -791,13 +791,14 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 						);
 						await deleteAskToJoin(userid);
 						// before kicking user from channel, send them a message in the vc channel
-						linkedchannelobj.send({ content: '<@' + userid + '> you have been denied access to the VC... you will be moved back to your previous channel in 5 seconds' }).then(msg => {
-							setTimeout(async function() {
-								// kick user from channel
-								await vctools.returnUserToPreviousChannel(userid);
-								msg.delete();
-							}, 5000);
-						});
+						linkedchannelobj.send({ content: '<@' + userid + '> you have been denied access to the VC\nYou will be moved back to your previous channel in 5 seconds' }).then(
+							msg => {
+								setTimeout(async function() {
+									// kick user from channel
+									await vctools.returnUserToPreviousChannel(userid);
+									msg.delete();
+								}, 5000);
+							});
 					}
 					catch (error) {
 						console.error(error);
