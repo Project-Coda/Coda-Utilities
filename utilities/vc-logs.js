@@ -11,6 +11,7 @@ async function updateChannel(userid, oldchannel, newchannel) {
 		new_channel = VALUES(new_channel)`;
 		await db.query(sql, [userid, oldchannel, newchannel]);
 		await db.end();
+		return;
 	}
 	catch (err) {
 		console.error(err);

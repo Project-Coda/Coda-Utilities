@@ -3,6 +3,7 @@ const mariadb = require('../db.js');
 const embedcreator = require('../embed.js');
 const env = require('../env.js');
 const { getMaxBitrate } = require('./vc-tools.js');
+const vctools = require('./vc-tools.js');
 collector = false;
 async function buttonResponder(interaction) {
 	const buttonid = interaction.customId;
@@ -773,7 +774,7 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 						await i.reply({ content: 'User denied access to channel', ephemeral: true });
 						deleteAskToJoin(userid);
 						// kick user from channel
-						await usertomove.voice.setChannel(null);
+						await vctools.returnUserToPreviousChannel(userid);
 					}
 					catch (error) {
 						console.error(error);
@@ -818,22 +819,33 @@ async function deleteAskToJoin(user_id) {
 
 }
 async function cleanupAskToJoinMessage(oldStateID, newStateID, user_id) {
-	// delete message if user leaves ask to join channel
-	const db = await mariadb.getConnection();
-	const rows = await db.query('SELECT message_id, channel_id, ask_to_join_vc FROM custom_vc_queue WHERE user_id = ?', [user_id]);
-	await db.end();
-	if (rows.length === 0) {
-		return;
+	try {
+		// delete message if user leaves ask to join channel
+		const db = await mariadb.getConnection();
+		const rows = await db.query('SELECT message_id, channel_id, ask_to_join_vc FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+		await db.end();
+		if (rows.length === 0) {
+			return;
+		}
+		const message_id = rows[0].message_id;
+		const channel_id = rows[0].channel_id;
+		const ask_to_join_vc = rows[0].ask_to_join_vc;
+		// check if user leaves ask to join channel
+		if (oldStateID === ask_to_join_vc && newStateID !== channel_id) {
+			const channel = await global.client.channels.cache.get(channel_id);
+			const message = await channel.messages.fetch(message_id);
+			await message.delete();
+			const db2 = await mariadb.getConnection();
+			await db2.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
+			await db2.end();
+			return;
+		}
 	}
-	// check if user leaves ask to join channel
-	if (oldStateID === rows[0].ask_to_join_vc && newStateID !== rows[0].channel_id) {
-		const channel = await global.client.channels.cache.get(rows[0].channel_id);
-		const message = await channel.messages.fetch(rows[0].message_id);
-		await message.delete();
-		const db2 = await mariadb.getConnection();
-		await db2.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
-		await db2.end();
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
 	}
+
 }
 
 module.exports = { Create, Cleanup, getChannels, checkUser, deleteChannel, buttonResponder, addUsertoVC, removeUserfromVC, setUserCustomVCPermissions, askToJoinSendMessage, deleteAskToJoinChannel, cleanupAskToJoinMessage };
