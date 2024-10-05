@@ -259,11 +259,11 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		await CustomVC.Cleanup(oldState);
 		// ensure channel still exists
 		newUserChannel = await newState.channelId;
-		if (!newUserChannel) return;
 		oldUserChannel = await oldState.channelId;
 		userid = await newState.member.id;
 		await vclogs.updateChannel(userid, oldUserChannel, newUserChannel);
 		await CustomVC.cleanupAskToJoinMessage(oldUserChannel, newUserChannel, userid);
+		if (!newUserChannel) return;
 		// get parent category of newState channel
 		const createcustomvc = env.utilities.customvc.channel;
 		const asktojoin_category = env.utilities.customvc.asktojoin;
@@ -272,7 +272,6 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 			CustomVC.Create(newState);
 		}
 		if (parent === asktojoin_category) {
-			console.log('User joined an ask to join channel.');
 			CustomVC.askToJoinSendMessage(userid, newUserChannel);
 		}
 		await vctools.setBitrate();
