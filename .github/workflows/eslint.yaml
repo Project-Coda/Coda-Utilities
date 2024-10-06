@@ -8,5 +8,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Setup Node.js environment
       uses: actions/setup-node@v4.0.4
+    - name: Install dev dependencies
+      run: npm install --only=dev
     - name: Run eslint
       run: npx eslint .
