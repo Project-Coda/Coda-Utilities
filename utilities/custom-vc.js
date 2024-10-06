@@ -845,7 +845,6 @@ async function deleteAskToJoin(user_id) {
 		// delete from db
 		await db.query('DELETE FROM custom_vc_queue WHERE user_id = ?', [user_id]);
 		await db.end();
-		console.log(message_id);
 		// delete message
 		const channel = await global.client.channels.cache.get(message_id[0].channel_id);
 		const message = await channel.messages.fetch(message_id[0].message_id);
