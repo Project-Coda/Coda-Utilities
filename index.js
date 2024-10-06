@@ -269,13 +269,13 @@ global.client.on('voiceStateUpdate', async (oldState, newState) => {
 		const asktojoin_category = env.utilities.customvc.asktojoin;
 		const parent = await vctools.getParentChannel(newUserChannel);
 		if (newUserChannel === createcustomvc) {
-			CustomVC.Create(newState);
+			await CustomVC.Create(newState);
 		}
 		if (parent === asktojoin_category) {
-			CustomVC.askToJoinSendMessage(userid, newUserChannel);
+			await CustomVC.askToJoinSendMessage(userid, newUserChannel);
 		}
-		await vctools.setBitrate();
 		await CustomVC.setUserCustomVCPermissions(newState, oldState);
+		await vctools.setBitrate();
 	}
 	catch (error) {
 		console.error(error);
