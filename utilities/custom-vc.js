@@ -766,18 +766,22 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 							}, 1000);
 						},
 						);
-						await usertomove.voice.setChannel(custom_vc);
+						if (usertomove.voice.channel.id === linkedchannel) {
+							await usertomove.voice.setChannel(custom_vc);
+						}
+						else {
+							await i.followUp({ content: 'User is no longer in the ask to join channel' }).then(msg => {
+								setTimeout(function() {
+									msg.delete();
+								}, 1000);
+							},
+							);
+						}
 						await deleteAskToJoin(userid);
 					}
 					catch (error) {
 						console.error(error);
 						embedcreator.sendError(error);
-						await i.followUp({ content: 'Error moving user to channel' }).then(msg => {
-							setTimeout(function() {
-								msg.delete();
-							}, 1000);
-						},
-						);
 						await deleteAskToJoin(userid);
 					}
 				}
@@ -791,11 +795,23 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 						);
 						await deleteAskToJoin(userid);
 						// before kicking user from channel, send them a message in the vc channel
-						linkedchannelobj.send({ content: '<@' + userid + '> you have been denied access to the VC\nYou will be moved back to your previous channel in 5 seconds' }).then(
+						await linkedchannelobj.send({ content: '<@' + userid + '> you have been denied access to the VC\nYou will be moved back to your previous channel in 5 seconds' }).then(
 							msg => {
 								setTimeout(async function() {
 									// kick user from channel
-									await vctools.returnUserToPreviousChannel(userid);
+									if (usertomove.voice.channel.id === linkedchannel) {
+										await vctools.returnUserToPreviousChannel(userid);
+									}
+									else {
+										await i.followUp({ content: 'User is no longer in the ask to join channel' }).then(
+											msg => {
+											// eslint-disable-next-line max-nested-callbacks
+												setTimeout(function() {
+													msg.delete();
+												}, 1000);
+											},
+										);
+									}
 									msg.delete();
 								}, 5000);
 							});
@@ -803,12 +819,6 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 					catch (error) {
 						console.error(error);
 						embedcreator.sendError(error);
-						i.followUp({ content: 'Error denying user access to channel' }).then(msg => {
-							setTimeout(function() {
-								msg.delete();
-							}, 1000);
-						},
-						);
 					}
 
 					collector.on('end', async collected => {
