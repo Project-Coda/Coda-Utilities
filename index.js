@@ -16,6 +16,7 @@ const vctools = require('./utilities/vc-tools.js');
 const { checkMention } = require('./utilities/message-filter.js');
 const nodecron = require('node-cron');
 const vclogs = require('./utilities/vc-logs.js');
+const { cleanupDB } = require('./utilities/cleanup.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -36,6 +37,7 @@ global.client.once('ready', async () => {
 	const members = await guild.members.fetch();
 	// set the client's presence
 	global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
+	await cleanupDB();
 });
 
 (async () => {
