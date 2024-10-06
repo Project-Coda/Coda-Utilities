@@ -754,6 +754,11 @@ async function askToJoinSendMessage(userid, linkedchannel) {
 			await db.end();
 			// get linked channel
 			const linkedchannelobj = await guild.channels.cache.get(linkedchannel);
+			linkedchannelobj.send({ content: '<@' + userid + '> your request to join has been sent!' }).then(msg => {
+				setTimeout(function() {
+					msg.delete();
+				}, 5000);
+			});
 			// message collector
 			const filter = i => i.user.id === channel_owner;
 			const collector = await message.createMessageComponentCollector({ filter, time: 3600000 });
