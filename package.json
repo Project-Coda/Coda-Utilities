@@ -27,14 +27,14 @@
   "dependencies": {
     "@discordjs/rest": "^2.4.0",
     "@tonaljs/tonal": "^4.10.0",
-    "discord-api-types": "^0.37.100",
-    "discord.js": "^14.16.2",
+    "discord-api-types": "^0.37.101",
+    "discord.js": "^14.16.3",
     "emoji-unicode": "^2.0.1",
     "figlet": "^1.7.0",
     "lodash": "^4.17.21",
     "mariadb": "^3.3.2",
     "node-cron": "^3.0.3",
     "node-fetch": "^2.7.0",
-    "openai": "^4.62.1"
+    "openai": "^4.67.1"
   }
 }
