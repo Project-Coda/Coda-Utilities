@@ -9,6 +9,6 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v4.0.4
     - name: Install eslint
-      run: npm install -g eslint@8.57.0
+      run: npm install -g eslint
     - name: Run eslint
       run: eslint --ext .js .
