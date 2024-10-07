@@ -45,7 +45,7 @@ async function cleanupDBRoles() {
 
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Role Assign 🧹',
-		description: `${totalItemsDeleted} item${totalItemsDeleted !== 1 ? 's' : ''} were removed from the database`,
+		description: `${totalItemsDeleted} item${totalItemsDeleted !== 1 ? 's were' : ' was'} removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (totalItemsDeleted > 0) {
@@ -69,7 +69,7 @@ async function cleanupDBAutoRoles() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Auto Roles 🧹',
-		description: `${rolesToDelete.length} role${rolesToDelete.length !== 1 ? 's' : ''} were removed from the database`,
+		description: `${rolesToDelete.length} role${rolesToDelete.length !== 1 ? 's were' : ' was'} removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (rolesToDelete.length > 0) {
@@ -93,7 +93,7 @@ async function cleanupDBNotify() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Notify',
-		description: `${usersToDelete.length} user${usersToDelete.length !== 1 ? 's' : ''} were removed from the database`,
+		description: `${usersToDelete.length} user${usersToDelete.length !== 1 ? 's were' : ' was'} removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (usersToDelete.length > 0) {
