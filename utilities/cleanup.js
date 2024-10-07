@@ -44,6 +44,7 @@ async function cleanupDBRoles() {
 	if (rolesToDelete.length > 0 || channelsToDelete.length > 0 || messagesToDelete.length > 0) {
 		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Role Assign 🧹', embeds: [embed] });
 	}
+	await db.end();
 
 }
 async function cleanupDBAutoRoles() {
@@ -67,6 +68,7 @@ async function cleanupDBAutoRoles() {
 	if (rolesToDelete.length > 0) {
 		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Auto Roles 🧹', embeds: [embed] });
 	}
+	await db.end();
 }
 async function cleanupDBNotify() {
 	const db = await mariadb.getConnection();
@@ -89,6 +91,7 @@ async function cleanupDBNotify() {
 	if (usersToDelete.length > 0) {
 		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Notify 🧹', embeds: [embed] });
 	}
+	await db.end();
 }
 async function cleanupDB() {
 	try {
