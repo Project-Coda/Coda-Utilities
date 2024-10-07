@@ -386,6 +386,7 @@ nodecron.schedule('0 0 * * *', async () => {
 		db.end();
 		embedcreator.log('Coda strikes older than an hour have been deleted.');
 		await cleanupDB();
+		embedcreator.log('Ran database cleanup.');
 	}
 	catch (error) {
 		console.error(error);
