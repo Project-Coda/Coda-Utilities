@@ -16,6 +16,7 @@ const vctools = require('./utilities/vc-tools.js');
 const { checkMention } = require('./utilities/message-filter.js');
 const nodecron = require('node-cron');
 const vclogs = require('./utilities/vc-logs.js');
+const { cleanupDB } = require('./utilities/cleanup.js');
 global.client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildModeration],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -36,6 +37,7 @@ global.client.once('ready', async () => {
 	const members = await guild.members.fetch();
 	// set the client's presence
 	global.client.user.setActivity(`${members.size} members`, { type: ActivityType.Watching });
+	await cleanupDB();
 });
 
 (async () => {
@@ -180,6 +182,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		const db = await mariadb.getConnection();
 		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 		db.end();
+		if (role.length === 0) return;
 		const roleId = String(role[0].id);
 		console.log(role);
 		console.log(roleId);
@@ -327,6 +330,52 @@ global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
 		await embedcreator.kickAlert(user, kickedUser, reasonformatted);
 		console.log(`${user.tag} kicked ${kickedUser.tag}! Reason: ${reasonformatted}`);
 	}
+	await cleanupDB();
+});
+global.client.on('guildMemberRemove', async member => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Member Left',
+			description: `${member.user.tag} has left the server.`,
+			image: member.user.displayAvatarURL({ dynamic: true }),
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
+global.client.on('roleDelete', async role => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Role Deleted',
+			description: `${role.name} was deleted.`,
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
+global.client.on('channelDelete', async channel => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Channel Deleted',
+			description: `${channel.name} was deleted.`,
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
 });
 
 // clear coda strkes older than an hour
@@ -336,6 +385,8 @@ nodecron.schedule('0 0 * * *', async () => {
 		await db.query('DELETE FROM coda_strikes WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 HOUR)');
 		db.end();
 		embedcreator.log('Coda strikes older than an hour have been deleted.');
+		await cleanupDB();
+		embedcreator.log('Ran database cleanup.');
 	}
 	catch (error) {
 		console.error(error);

@@ -59,7 +59,10 @@ async function returnUserToPreviousChannel(userid) {
 		await db.end();
 		const guild = await global.client.guilds.cache.get(env.discord.guild);
 		const member = await guild.members.cache.get(userid);
-		if (!previouschannel) {
+		// ensure previous channel is not in the custom vc category or the asktojoin category
+		const parentchannel = await getParentChannel(previouschannel);
+		const custom_vc_category = await getParentChannel(env.utilities.customvc.channel);
+		if (parentchannel === custom_vc_category || parentchannel === env.utilities.customvc.asktojoin || previouschannel === null) {
 			return await member.voice.setChannel(null);
 		}
 		else {
