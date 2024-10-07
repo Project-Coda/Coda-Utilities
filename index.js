@@ -182,6 +182,7 @@ global.client.on('messageReactionAdd', async (reaction, user) => {
 		const db = await mariadb.getConnection();
 		const role = await db.query('SELECT * FROM roles WHERE emoji = ? AND message_id = ?', [emoji, message.id]);
 		db.end();
+		if (role.length === 0) return;
 		const roleId = String(role[0].id);
 		console.log(role);
 		console.log(roleId);
