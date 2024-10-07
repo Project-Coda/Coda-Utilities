@@ -338,6 +338,7 @@ nodecron.schedule('0 0 * * *', async () => {
 		await db.query('DELETE FROM coda_strikes WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 HOUR)');
 		db.end();
 		embedcreator.log('Coda strikes older than an hour have been deleted.');
+		await cleanupDB();
 	}
 	catch (error) {
 		console.error(error);
