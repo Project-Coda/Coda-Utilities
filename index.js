@@ -330,6 +330,52 @@ global.client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
 		await embedcreator.kickAlert(user, kickedUser, reasonformatted);
 		console.log(`${user.tag} kicked ${kickedUser.tag}! Reason: ${reasonformatted}`);
 	}
+	await cleanupDB();
+});
+global.client.on('guildMemberRemove', async member => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Member Left',
+			description: `${member.user.tag} has left the server.`,
+			image: member.user.displayAvatarURL({ dynamic: true }),
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
+global.client.on('roleDelete', async role => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Role Deleted',
+			description: `${role.name} was deleted.`,
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
+});
+
+global.client.on('channelDelete', async channel => {
+	try {
+		const embed = embedcreator.setembed({
+			title: 'Channel Deleted',
+			description: `${channel.name} was deleted.`,
+			color: 0xe74c3c,
+		});
+		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
+	}
+	catch (error) {
+		console.error(error);
+		embedcreator.sendError(error);
+	}
 });
 
 // clear coda strkes older than an hour
