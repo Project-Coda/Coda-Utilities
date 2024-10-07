@@ -45,15 +45,15 @@ async function cleanupDBRoles() {
 
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Role Assign 🧹',
-		description: totalItemsDeleted + ' items Were Removed From The Database',
+		description: `${totalItemsDeleted} item${totalItemsDeleted !== 1 ? 's' : ''} were removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (totalItemsDeleted > 0) {
 		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Role Assign 🧹', embeds: [embed] });
 	}
 	await db.end();
-
 }
+
 async function cleanupDBAutoRoles() {
 	const db = await mariadb.getConnection();
 	const queryroles = 'SELECT role_id FROM auto_role';
@@ -69,7 +69,7 @@ async function cleanupDBAutoRoles() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Auto Roles 🧹',
-		description: rolesToDelete.length + ' roles Were Removed From The Database',
+		description: `${rolesToDelete.length} role${rolesToDelete.length !== 1 ? 's' : ''} were removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (rolesToDelete.length > 0) {
@@ -77,6 +77,7 @@ async function cleanupDBAutoRoles() {
 	}
 	await db.end();
 }
+
 async function cleanupDBNotify() {
 	const db = await mariadb.getConnection();
 	const queryusers = 'SELECT user_id FROM notify';
@@ -92,7 +93,7 @@ async function cleanupDBNotify() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Notify',
-		description: usersToDelete.length + ' users Were Removed From The Database',
+		description: `${usersToDelete.length} user${usersToDelete.length !== 1 ? 's' : ''} were removed from the database`,
 		color: 0xe74c3c,
 	});
 	if (usersToDelete.length > 0) {
@@ -100,6 +101,7 @@ async function cleanupDBNotify() {
 	}
 	await db.end();
 }
+
 async function cleanupDB() {
 	try {
 		await cleanupDBRoles();
