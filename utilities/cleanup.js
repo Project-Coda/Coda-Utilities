@@ -13,7 +13,8 @@ async function cleanupDBRoles() {
 	for (const role of rolesToDelete) {
 		const query = 'DELETE FROM roles WHERE id = ?';
 		await db.query(query, [role]);
-		console.log(`Deleted role from database: ${role}`);
+		console.log(`Deleted role id: ${role} from roles table`);
+
 	}
 	const queryChannels = 'SELECT channel_id FROM roles';
 	const queryChannelsResult = await db.query(queryChannels);
@@ -23,7 +24,7 @@ async function cleanupDBRoles() {
 	for (const channel of channelsToDelete) {
 		const query = 'DELETE FROM roles WHERE channel_id = ?';
 		await db.query(query, [channel]);
-		console.log(`Deleted channel from database: ${channel}`);
+		console.log(`Deleted channel id: ${channel} from roles table`);
 	}
 	const queryMessages = 'SELECT message_id FROM roles';
 	const queryMessagesResult = await db.query(queryMessages);
@@ -37,7 +38,7 @@ async function cleanupDBRoles() {
 			messagesToDelete += 1;
 			const query = 'DELETE FROM roles WHERE message_id = ?';
 			await db.query(query, [message]);
-			console.log(`Deleted message from database: ${message}`);
+			console.log(`Deleted message id: ${message} from roles table`);
 		}
 	}
 	// add up all the items that were deleted
@@ -65,7 +66,7 @@ async function cleanupDBAutoRoles() {
 	for (const role of rolesToDelete) {
 		const query = 'DELETE FROM auto_role WHERE role_id = ?';
 		await db.query(query, [role]);
-		console.log(`Deleted autorole from database: ${role}`);
+		console.log(`Deleted role id: ${role} from auto_role table`);
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Auto Roles 🧹',
@@ -89,7 +90,7 @@ async function cleanupDBNotify() {
 	for (const user of usersToDelete) {
 		const query = 'DELETE FROM notify WHERE user_id = ?';
 		await db.query(query, [user]);
-		console.log(`Deleted notify from database: ${user}`);
+		console.log(`Deleted user id ${user} from notify table`);
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Notify',
@@ -101,12 +102,36 @@ async function cleanupDBNotify() {
 	}
 	await db.end();
 }
+async function cleanupDBVC_Logs() {
+	const db = await mariadb.getConnection();
+	const queryusers = 'SELECT user_id FROM vc_logs';
+	const queryusersresult = await db.query(queryusers);
+	const users = queryusersresult.map(user => user.user_id);
+	const guild = await client.guilds.cache.get(env.discord.guild);
+	const guildmembers = guild.members.cache.map(member => member.id);
+	const usersToDelete = users.filter(user => !guildmembers.includes(user));
+	for (const user of usersToDelete) {
+		const query = 'DELETE FROM vc_logs WHERE user_id = ?';
+		await db.query(query, [user]);
+		console.log(`Deleted user id ${user} from vc_logs table`);
+	}
+	const embed = embedcreator.setembed({
+		title: 'Ran Cleanup on VC Logs',
+		description: `${usersToDelete.length} user${usersToDelete.length !== 1 ? 's were' : ' was'} removed from the database`,
+		color: 0xe74c3c,
+	});
+	if (usersToDelete.length > 0) {
+		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on VC Logs 🧹', embeds: [embed] });
+	}
+	await db.end();
+}
 
 async function cleanupDB() {
 	try {
 		await cleanupDBRoles();
 		await cleanupDBAutoRoles();
 		await cleanupDBNotify();
+		await cleanupDBVC_Logs();
 	}
 	catch (err) {
 		console.log(err);
