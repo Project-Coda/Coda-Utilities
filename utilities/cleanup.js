@@ -28,20 +28,27 @@ async function cleanupDBRoles() {
 	const queryMessages = 'SELECT message_id FROM roles';
 	const queryMessagesResult = await db.query(queryMessages);
 	const messages = await queryMessagesResult.map(message => message.message_id);
-	const guildmessages = guild.channels.cache.map(message => message.id);
-	const messagesToDelete = messages.filter(message => !guildmessages.includes(message));
-	for (const message of messagesToDelete) {
-		const query = 'DELETE FROM roles WHERE message_id = ?';
-		await db.query(query, [message]);
-		console.log(`Deleted message from database: ${message}`);
+	let messagesToDelete = 0;
+	for (const message of messages) {
+		// check if message exists if it doesn't delete it
+		const channel = await db.query('SELECT channel_id FROM roles WHERE message_id = ?', [message]);
+		const messageExists = await guild.channels.cache.get(channel[0].channel_id).messages.fetch(message).catch(() => false);
+		if (!messageExists) {
+			messagesToDelete += 1;
+			const query = 'DELETE FROM roles WHERE message_id = ?';
+			await db.query(query, [message]);
+			console.log(`Deleted message from database: ${message}`);
+		}
 	}
+	// add up all the items that were deleted
+	const totalItemsDeleted = rolesToDelete.length + channelsToDelete.length + messagesToDelete;
 
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Role Assign 🧹',
-		description:  rolesToDelete.length + ' Items Were Removed From The Database',
+		description: totalItemsDeleted + ' items Were Removed From The Database',
 		color: 0xe74c3c,
 	});
-	if (rolesToDelete.length > 0 || channelsToDelete.length > 0 || messagesToDelete.length > 0) {
+	if (totalItemsDeleted > 0) {
 		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Role Assign 🧹', embeds: [embed] });
 	}
 	await db.end();
@@ -62,7 +69,7 @@ async function cleanupDBAutoRoles() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Auto Roles 🧹',
-		description: rolesToDelete.length + ' Roles Were Removed From The Database',
+		description: rolesToDelete.length + ' roles Were Removed From The Database',
 		color: 0xe74c3c,
 	});
 	if (rolesToDelete.length > 0) {
@@ -85,7 +92,7 @@ async function cleanupDBNotify() {
 	}
 	const embed = embedcreator.setembed({
 		title: 'Ran Cleanup on Notify',
-		description: usersToDelete.length + ' Users Were Removed From The Database',
+		description: usersToDelete.length + ' users Were Removed From The Database',
 		color: 0xe74c3c,
 	});
 	if (usersToDelete.length > 0) {
