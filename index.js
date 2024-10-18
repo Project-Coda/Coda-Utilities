@@ -337,7 +337,6 @@ global.client.on('guildMemberRemove', async member => {
 		const embed = embedcreator.setembed({
 			title: 'Member Left',
 			description: `${member.user.tag} has left the server.`,
-			image: member.user.displayAvatarURL({ dynamic: true }),
 			color: 0xe74c3c,
 		});
 		global.client.channels.cache.get(env.discord.logs_channel).send({ embeds: [embed] });
