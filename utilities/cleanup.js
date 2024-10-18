@@ -50,7 +50,7 @@ async function cleanupDBRoles() {
 		color: 0xe74c3c,
 	});
 	if (totalItemsDeleted > 0) {
-		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Role Assign 🧹', embeds: [embed] });
+		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: 'Ran Cleanup on Role Assign 🧹', embeds: [embed] });
 	}
 	await db.end();
 }
@@ -74,7 +74,7 @@ async function cleanupDBAutoRoles() {
 		color: 0xe74c3c,
 	});
 	if (rolesToDelete.length > 0) {
-		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Auto Roles 🧹', embeds: [embed] });
+		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: 'Ran Cleanup on Auto Roles 🧹', embeds: [embed] });
 	}
 	await db.end();
 }
@@ -98,7 +98,7 @@ async function cleanupDBNotify() {
 		color: 0xe74c3c,
 	});
 	if (usersToDelete.length > 0) {
-		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on Notify 🧹', embeds: [embed] });
+		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: 'Ran Cleanup on Notify 🧹', embeds: [embed] });
 	}
 	await db.end();
 }
@@ -121,7 +121,7 @@ async function cleanupDBVC_Logs() {
 		color: 0xe74c3c,
 	});
 	if (usersToDelete.length > 0) {
-		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: '<@&' + env.discord.admin_role + '> Ran Cleanup on VC Logs 🧹', embeds: [embed] });
+		await global.client.channels.cache.get(env.discord.logs_channel).send({ content: 'Ran Cleanup on VC Logs 🧹', embeds: [embed] });
 	}
 	await db.end();
 }
