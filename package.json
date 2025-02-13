@@ -28,7 +28,7 @@
     "@tonaljs/tonal": "^4.10.0",
     "discord-api-types": "^0.37.119",
     "discord.js": "^14.18.0",
-    "emoji-unicode": "^2.0.1",
+    "emoji-unicode": "^2.0.2",
     "figlet": "^1.8.0",
     "lodash": "^4.17.21",
     "mariadb": "^3.4.0",
