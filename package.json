@@ -34,6 +34,6 @@
     "mariadb": "^3.4.1",
     "node-cron": "^3.0.3",
     "node-fetch": "^2.7.0",
-    "openai": "^4.91.1"
+    "openai": "^4.92.0"
   }
 }
