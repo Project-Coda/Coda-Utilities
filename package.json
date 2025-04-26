@@ -31,7 +31,7 @@
     "emoji-unicode": "^2.0.2",
     "figlet": "^1.8.1",
     "lodash": "^4.17.21",
-    "mariadb": "^3.4.1",
+    "mariadb": "^3.4.2",
     "node-cron": "^3.0.3",
     "node-fetch": "^2.7.0",
     "openai": "^4.96.0"
