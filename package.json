@@ -27,7 +27,7 @@
     "@discordjs/rest": "^2.6.0",
     "@tonaljs/tonal": "^4.10.0",
     "discord-api-types": "^0.38.31",
-    "discord.js": "^14.23.2",
+    "discord.js": "^14.24.0",
     "emoji-unicode": "^2.0.2",
     "figlet": "^1.9.3",
     "lodash": "^4.17.21",
