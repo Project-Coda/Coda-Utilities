@@ -32,7 +32,7 @@
     "figlet": "^1.9.3",
     "lodash": "^4.17.21",
     "mariadb": "^3.4.5",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.2.1",
     "node-fetch": "^2.7.0",
     "openai": "^4.104.0"
   }
